@@ -1,0 +1,14 @@
+test/
+examples/
+.github
+*.config.js
+*.sh
+*.*.json
+__tests__/
+__mocks__/
+index-dev.js
+index-dev.html
+index.html
+interfaces/
+.husky
+.travis.yml
