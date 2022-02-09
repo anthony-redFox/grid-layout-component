@@ -1,5 +1,3 @@
-// @ts-expect-error need to fix
-import isEqual from "lodash.isequal";
 import {
   bottom,
   cloneLayout,
@@ -21,6 +19,24 @@ import type {
   gridLayoutElementDragDetail,
   gridLayoutElementResizeDetail
 } from "./GridItem";
+
+function isEqual(arr: GridLayoutElementData[], arr2: GridLayoutElementData[]) {
+  if (arr.length !== arr2.length) {
+    return false;
+  }
+  return arr.every((l, index) => {
+    const l2 = arr2[index];
+    if (l2 === l) {
+      return true;
+    }
+    const keys = Object.keys(l) as keysElementData[];
+    const keys2 = Object.keys(l2) as keysElementData[];
+
+    return (
+      keys.length === keys2.length && keys.every((key) => l[key] === l2[key])
+    );
+  });
+}
 
 const template = document.createElement("template");
 template.innerHTML = `<style>
@@ -53,6 +69,8 @@ export interface GridLayoutElementData {
   static?: boolean;
   moved?: boolean;
 }
+
+type keysElementData = keyof GridLayoutElementData;
 
 interface GridLayoutState {
   autoSize: boolean;
@@ -369,7 +387,7 @@ export default class GridLayout extends HTMLElement {
 
   onLayoutMaybeChanged(
     newLayout: Array<GridLayoutElementData>,
-    oldLayout: Array<GridLayoutElementData> | null
+    oldLayout?: Array<GridLayoutElementData> | null
   ) {
     if (!oldLayout) oldLayout = this.state.layout;
 
@@ -517,7 +535,7 @@ export default class GridLayout extends HTMLElement {
       this.state.layout = this.state.allowOverlap
         ? correctedLayout
         : compact(correctedLayout, this.state.compactType, cols);
-      this.onLayoutMaybeChanged(this.state.layout, null);
+      this.onLayoutMaybeChanged(this.state.layout, this.layout);
       this.render();
     });
     const placeholder =
