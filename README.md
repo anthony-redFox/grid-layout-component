@@ -1,6 +1,6 @@
 # Grid-Layout-Component
 
-[![travis build](https://travis-ci.org/STRML/react-grid-layout.svg?branch=master)](https://travis-ci.org/STRML/react-grid-layout)
+[![Node.js CI](https://github.com/anthony-redFox/grid-layout-component/actions/workflows/node.js.yml/badge.svg)](https://github.com/anthony-redFox/grid-layout-component/actions/workflows/node.js.yml)
 [![npm package](https://img.shields.io/npm/v/react-grid-layout.svg?style=flat-square)](https://www.npmjs.org/package/react-grid-layout)
 [![npm downloads](https://img.shields.io/npm/dt/react-grid-layout.svg?maxAge=2592000)]()
 
