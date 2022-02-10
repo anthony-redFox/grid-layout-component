@@ -103,6 +103,10 @@ export default class GridLayout extends HTMLElement {
   colsAdaptation = { lg: 12, md: 10, sm: 6, xs: 4, xxs: 2 };
   containerPadding = { lg: null, md: null, sm: null, xs: null, xxs: null };
   layout: Array<GridLayoutElementData> = [];
+  maximaze = {
+    overflow: "",
+    top: 0
+  };
 
   state: GridLayoutState = {
     autoSize: true,
@@ -163,6 +167,25 @@ export default class GridLayout extends HTMLElement {
       this.onResize(detail, target);
     } else if (detail.life === "end") {
       this.onResizeStop();
+    }
+  };
+
+  maximazeHandler = (event: CustomEvent<boolean>) => {
+    const { detail, target } = event;
+    if (!(target instanceof HTMLElement) || target.parentElement !== this) {
+      return;
+    }
+
+    if (detail) {
+      this.maximaze = {
+        overflow: this.style.overflow,
+        top: this.scrollTop
+      };
+      this.style.overflow = "hidden";
+      this.scrollTop = 0;
+    } else {
+      this.style.overflow = this.maximaze.overflow;
+      this.scrollTop = this.maximaze.top;
     }
   };
 
@@ -474,6 +497,10 @@ export default class GridLayout extends HTMLElement {
       "gridLayoutElementResize",
       this.resizeHandler as EventListener
     );
+    this.addEventListener(
+      "gridLayoutElementMaximaze",
+      this.maximazeHandler as EventListener
+    );
     this.shadow = this.attachShadow({ mode: "open" });
     // @ts-expect-error global
     this.shadow.adoptedStyleSheets = [this.sheet];
@@ -488,7 +515,7 @@ export default class GridLayout extends HTMLElement {
       const children = slot.assignedNodes();
       const { isDraggable, isResizable, isBounded } = this.state;
       children.forEach((node) => {
-        if (!(node instanceof HTMLElement) || !node.id) {
+        if (!(node instanceof HTMLElement) || !node.dataset.id) {
           return;
         }
 
@@ -498,7 +525,7 @@ export default class GridLayout extends HTMLElement {
         const h = Number.parseInt(node.getAttribute("h") || "1");
 
         const l = {
-          i: node.id,
+          i: node.dataset.id,
           static: node.hasAttribute("static"),
           isDraggable: node.hasAttribute("drag")
             ? node.getAttribute("drag") !== "false"
@@ -545,6 +572,10 @@ export default class GridLayout extends HTMLElement {
     }
     this.observer.observe(this);
     this.calculateSize();
+    const style = window.getComputedStyle(this);
+    if (style.overflow !== "visible" || style.height !== "auto") {
+      this.state.autoSize = false;
+    }
   }
 
   attributeChangedCallback(name: string, old: string, newV: string) {
@@ -561,10 +592,14 @@ export default class GridLayout extends HTMLElement {
   fastRender(layout: Record<string, GridLayoutElementData>) {
     const arr = ["x", "y"] as const;
     for (const node of this.children) {
-      const l = layout[node.id];
-      if (!l || !(node instanceof GridItem)) {
+      if (
+        !(node instanceof GridItem) ||
+        !node.dataset.id ||
+        !layout[node.dataset.id]
+      ) {
         continue;
       }
+      const l = layout[node.dataset.id];
       arr.forEach(
         (key) =>
           node.state[key] !== l[key] && node.setAttribute(key, String(l[key]))
@@ -632,10 +667,14 @@ export default class GridLayout extends HTMLElement {
 
     const arr = ["x", "y", "w", "h"] as const;
     for (const node of this.children) {
-      const l = layout[node.id];
-      if (!l || !(node instanceof GridItem)) {
+      if (
+        !(node instanceof GridItem) ||
+        !node.dataset.id ||
+        !layout[node.dataset.id]
+      ) {
         continue;
       }
+      const l = layout[node.dataset.id];
       arr.forEach(
         (key) =>
           node.state[key] !== l[key] && node.setAttribute(key, String(l[key]))

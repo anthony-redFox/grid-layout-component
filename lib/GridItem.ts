@@ -15,6 +15,14 @@ template.innerHTML = `<style>:host {
   box-sizing: border-box;
   transition: transform 200ms ease;
 }
+:host([maximize]) {
+  position: sticky;
+  width: calc(100% - var(--grid-layout-padding-left) * 2);
+  height: calc(100% - var(--grid-layout-padding-top) * 2);
+  transform: translate(var(--grid-layout-padding-left),var(--grid-layout-padding-top));
+  transition: width 200ms ease, height 200ms ease;
+  z-index: 3;
+}
 :host([resizable]) .resizable-handle {
   position: absolute;
   width: 20px;
@@ -93,7 +101,11 @@ export default class GridLayoutElement extends HTMLElement {
    * @param  {Object} callbackData  an object with node, delta and position information
    */
   onDragStart() {
-    if (this.hasAttribute("static") || this.getAttribute("drag") === "false") {
+    if (
+      this.hasAttribute("static") ||
+      this.hasAttribute("maximize") ||
+      this.getAttribute("drag") === "false"
+    ) {
       return false;
     }
     const transformScale = this.transformScale;
@@ -137,7 +149,7 @@ export default class GridLayoutElement extends HTMLElement {
       bubbles: true,
       cancelable: true,
       detail: {
-        key: this.id,
+        key: this.dataset.id,
         life: "start"
       }
     });
@@ -180,7 +192,7 @@ export default class GridLayoutElement extends HTMLElement {
       new CustomEvent("gridLayoutElementDrag", {
         bubbles: true,
         detail: {
-          key: this.id,
+          key: this.dataset.id,
           life: "move",
           top,
           left
@@ -207,7 +219,7 @@ export default class GridLayoutElement extends HTMLElement {
       new CustomEvent("gridLayoutElementDrag", {
         bubbles: true,
         detail: {
-          key: this.id,
+          key: this.dataset.id,
           life: "end",
           top,
           left
@@ -228,7 +240,7 @@ export default class GridLayoutElement extends HTMLElement {
       new CustomEvent("gridLayoutElementResize", {
         bubbles: true,
         detail: {
-          key: this.id,
+          key: this.dataset.id,
           life: "end"
         }
       })
@@ -249,6 +261,7 @@ export default class GridLayoutElement extends HTMLElement {
       } {
     if (
       this.hasAttribute("static") ||
+      this.hasAttribute("maximize") ||
       this.getAttribute("resizable") === "false"
     ) {
       return false;
@@ -257,7 +270,7 @@ export default class GridLayoutElement extends HTMLElement {
     const event = new CustomEvent("gridLayoutElementResize", {
       bubbles: true,
       detail: {
-        key: this.id,
+        key: this.dataset.id,
         life: "start"
       }
     });
@@ -314,7 +327,7 @@ export default class GridLayoutElement extends HTMLElement {
       new CustomEvent("gridLayoutElementResize", {
         bubbles: true,
         detail: {
-          key: this.id,
+          key: this.dataset.id,
           life: "move",
           width: size.width,
           height: size.height
@@ -345,10 +358,21 @@ export default class GridLayoutElement extends HTMLElement {
     });
   }
 
-  attributeChangedCallback(name: string, old: string, newValue: string) {
+  attributeChangedCallback(
+    name: string,
+    old: string | null,
+    newValue: string | null
+  ) {
     if ("x" === name || "y" === name || "h" === name || "w" === name) {
-      this.state[name] = Number.parseInt(newValue);
+      this.state[name] = Number.parseInt(newValue || "");
       this.setVaribles();
+    } else if (name === "maximize") {
+      this.dispatchEvent(
+        new CustomEvent("gridLayoutElementMaximaze", {
+          bubbles: true,
+          detail: newValue !== null
+        })
+      );
     }
   }
 
@@ -365,6 +389,6 @@ export default class GridLayoutElement extends HTMLElement {
   }
 
   static get observedAttributes() {
-    return ["x", "y", "h", "w"];
+    return ["x", "y", "h", "w", "maximize"];
   }
 }
