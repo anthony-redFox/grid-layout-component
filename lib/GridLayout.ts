@@ -13,7 +13,14 @@ import {
   getBreakpointFromWidth,
   getColsFromBreakpoint
 } from "./responsiveUtils";
-import { calcGridItemPosition, calcXY, calcWH, clamp } from "./calculateUtils";
+import {
+  calcGridColWidth,
+  calcGridItemPosition,
+  calcXY,
+  calcWH,
+  clamp,
+  type PositionParams
+} from "./calculateUtils";
 import GridItem from "./GridItem";
 import type {
   gridLayoutElementDragDetail,
@@ -426,12 +433,11 @@ export default class GridLayout extends HTMLElement {
     }
   }
 
-  getPositionParams() {
+  getPositionParams(): PositionParams {
     return {
       cols: this.state.colsNumber,
       columnWidth: this.state.columnWidth,
       containerPadding: this.state.containerPadding || this.state.margin,
-      containerWidth: this.clientWidth,
       margin: this.state.margin,
       maxRows: this.state.maxRows,
       rowHeight: this.state.rowHeight
@@ -466,19 +472,16 @@ export default class GridLayout extends HTMLElement {
 
     const { rowHeight, margin } = this.state;
     const containerPadding = padding || margin;
-    const columnWidth = Math.round(
-      (this.clientWidth -
-        margin[0] * (colsNumber - 1) -
-        containerPadding[0] * 2) /
-        colsNumber
+    this.state.columnWidth = calcGridColWidth(
+      this.getPositionParams(),
+      this.clientWidth
     );
-    this.state.columnWidth = columnWidth;
 
     // @ts-expect-error global
     this.sheet.replaceSync(`
       :host {
         --grid-layout-cols: ${colsNumber};
-        --grid-element-width: ${columnWidth}px;
+        --grid-element-width: ${this.state.columnWidth}px;
         --grid-element-height: ${rowHeight}px;
         --grid-element-margin-left: ${margin[0]}px;
         --grid-element-margin-top: ${margin[1]}px;

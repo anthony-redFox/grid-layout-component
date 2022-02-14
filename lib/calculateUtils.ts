@@ -1,15 +1,18 @@
 export type PositionParams = {
   margin: [number, number];
   containerPadding: [number, number];
-  containerWidth: number;
+  columnWidth: number;
   cols: number;
   rowHeight: number;
   maxRows: number;
 };
 
 // Helper for generating column width
-export function calcGridColWidth(positionParams: PositionParams): number {
-  const { margin, containerPadding, containerWidth, cols } = positionParams;
+export function calcGridColWidth(
+  positionParams: PositionParams,
+  containerWidth: number
+): number {
+  const { margin, containerPadding, cols } = positionParams;
   return (
     (containerWidth - margin[0] * (cols - 1) - containerPadding[0] * 2) / cols
   );
@@ -48,14 +51,12 @@ export function calcGridItemPosition(
   w: number,
   h: number
 ) {
-  const { margin, containerPadding, rowHeight } = positionParams;
-  const colWidth = calcGridColWidth(positionParams);
-
+  const { margin, containerPadding, rowHeight, columnWidth } = positionParams;
   return {
-    width: calcGridItemWHPx(w, colWidth, margin[0]),
+    width: calcGridItemWHPx(w, columnWidth, margin[0]),
     height: calcGridItemWHPx(h, rowHeight, margin[1]),
     top: Math.round((rowHeight + margin[1]) * y + containerPadding[1]),
-    left: Math.round((colWidth + margin[0]) * x + containerPadding[0])
+    left: Math.round((columnWidth + margin[0]) * x + containerPadding[0])
   };
 }
 
@@ -75,8 +76,7 @@ export function calcXY(
   w: number,
   h: number
 ): { x: number; y: number } {
-  const { margin, cols, rowHeight, maxRows } = positionParams;
-  const colWidth = calcGridColWidth(positionParams);
+  const { margin, cols, rowHeight, maxRows, columnWidth } = positionParams;
 
   // left = colWidth * x + margin * (x + 1)
   // l = cx + m(x+1)
@@ -85,7 +85,7 @@ export function calcXY(
   // l - m = x(c + m)
   // (l - m) / (c + m) = x
   // x = (left - margin) / (coldWidth + margin)
-  let x = Math.round((left - margin[0]) / (colWidth + margin[0]));
+  let x = Math.round((left - margin[0]) / (columnWidth + margin[0]));
   let y = Math.round((top - margin[1]) / (rowHeight + margin[1]));
 
   // Capping
@@ -110,13 +110,11 @@ export function calcWH(
   x: number,
   y: number
 ): { w: number; h: number } {
-  const { margin, maxRows, cols, rowHeight } = positionParams;
-  const colWidth = calcGridColWidth(positionParams);
-
+  const { margin, maxRows, cols, rowHeight, columnWidth } = positionParams;
   // width = colWidth * w - (margin * (w - 1))
   // ...
   // w = (width + margin) / (colWidth + margin)
-  let w = Math.round((width + margin[0]) / (colWidth + margin[0]));
+  let w = Math.round((width + margin[0]) / (columnWidth + margin[0]));
   let h = Math.round((height + margin[1]) / (rowHeight + margin[1]));
 
   // Capping

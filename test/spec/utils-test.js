@@ -472,14 +472,14 @@ describe("compact horizontal", () => {
 const basePositionParams = {
   margin: [0, 0],
   containerPadding: [0, 0],
-  containerWidth: 800,
   cols: 8,
   rowHeight: 50,
   maxRows: 12
 };
+const containerWidth = 800;
 describe("calcGridColWidth", () => {
   it("should complete basic calculation", () => {
-    expect(calcGridColWidth(basePositionParams)).toEqual(100);
+    expect(calcGridColWidth(basePositionParams, containerWidth)).toEqual(100);
   });
 
   it("should consider margin", () => {
@@ -488,7 +488,7 @@ describe("calcGridColWidth", () => {
       margin: [10, 10]
     };
     // 70 px of margin in total (one between each of 8 items)
-    expect(calcGridColWidth(positionParams)).toEqual(91.25);
+    expect(calcGridColWidth(positionParams, containerWidth)).toEqual(91.25);
   });
 
   it("should consider container padding", () => {
@@ -497,7 +497,7 @@ describe("calcGridColWidth", () => {
       containerPadding: [100, 0]
     };
     // (800 - 100 - 100) / 8
-    expect(calcGridColWidth(positionParams)).toEqual(75);
+    expect(calcGridColWidth(positionParams, containerWidth)).toEqual(75);
   });
 
   it("should consider margin and padding", () => {
@@ -507,7 +507,7 @@ describe("calcGridColWidth", () => {
       containerPadding: [100, 0]
     };
     // (800 - 100 - 100 - 70) / 8
-    expect(calcGridColWidth(positionParams)).toEqual(66.25);
+    expect(calcGridColWidth(positionParams, containerWidth)).toEqual(66.25);
   });
 });
 
@@ -521,6 +521,7 @@ describe("calcGridItemPosition", () => {
     const dragging = null;
     const positionParams = {
       ...basePositionParams,
+      columnWidth: 66.25,
       margin: [10, 10],
       containerPadding: [100, 100]
     };
@@ -539,7 +540,7 @@ describe("calcWH", () => {
   const mockPositionParams = {
     margin: [0, 0],
     containerPadding: [0, 0],
-    containerWidth: 400,
+    columnWidth: 100,
     cols: 4,
     rowHeight: 200,
     maxRows: 3
@@ -562,7 +563,7 @@ describe("calcXY", () => {
   const mockPositionParams = {
     margin: [0, 0],
     containerPadding: [0, 0],
-    containerWidth: 500,
+    columnWidth: 125,
     cols: 4,
     rowHeight: 100,
     maxRows: 3
