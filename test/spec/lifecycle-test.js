@@ -4,7 +4,7 @@ import React from "react";
 import _ from "lodash";
 import TestUtils from "react-dom/test-utils";
 import GridLayout from "../../lib/GridLayout";
-import GridItem from "../../lib/GridItem";
+import GridItem from "../../lib/GridLayoutElement";
 // import BasicLayout from "../examples/1-basic";
 import ShowcaseLayout from "../examples/0-showcase";
 // import DroppableLayout from "../examples/15-drag-from-outside";

@@ -13,7 +13,7 @@ template.innerHTML = `<style>:host {
   transform: translate(calc((var(--grid-element-width) + var(--grid-element-margin-left)) * var(--element-x, 0) + var(--grid-layout-padding-left)),calc((var(--grid-element-height) + var(--grid-element-margin-top)) * var(--element-y, 0) + var(--grid-layout-padding-top)));
   position: absolute;
   box-sizing: border-box;
-  transition: transform 200ms ease;
+  transition: transform 200ms ease, visibility 100ms linear;
 }
 :host([maximize]) {
   position: sticky;
@@ -83,6 +83,7 @@ export interface gridLayoutElementResizeDetail {
 
 export default class GridLayoutElement extends HTMLElement {
   declare shadow: ShadowRoot;
+  template = template;
   sheet = new CSSStyleSheet();
   transformScale = 1;
   minW = 1;
@@ -336,26 +337,34 @@ export default class GridLayoutElement extends HTMLElement {
     );
   }
 
-  connectedCallback() {
-    this.shadow = this.attachShadow({ mode: "open" });
-    this.shadow.appendChild(template.content.cloneNode(true));
-    // @ts-expect-error global
-    this.shadow.adoptedStyleSheets = [this.sheet];
-    const element = this.shadow.querySelector<HTMLElement>(".resizable-handle");
-    if (!element) {
-      return;
-    }
+  makeDraggable() {
     draggable(this, {
       onStart: () => this.onDragStart(),
       onDrag: (e, data) => this.onDrag(e, data),
       onStop: () => this.onDragStop(),
       scale: this.transformScale
     });
+  }
+
+  makeResizable() {
+    const element = this.shadow.querySelector<HTMLElement>(".resizable-handle");
+    if (!element) {
+      return;
+    }
     resizable(this, element, {
       stop: () => this.onResizeStop(),
       start: () => this.onResizeStart(),
       resize: (...arg) => this.onResize(...arg)
     });
+  }
+
+  connectedCallback() {
+    this.shadow = this.attachShadow({ mode: "open" });
+    this.shadow.appendChild(this.template.content.cloneNode(true));
+    // @ts-expect-error global
+    this.shadow.adoptedStyleSheets = [this.sheet];
+    this.makeDraggable();
+    this.makeResizable();
   }
 
   attributeChangedCallback(

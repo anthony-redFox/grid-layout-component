@@ -2,9 +2,11 @@
 import * as React from "react";
 import _ from "lodash";
 import GridLayout from '../../lib/GridLayout';
-import GridLayoutElement from '../../lib/GridItem';
+import GridLayoutElement from '../../lib/GridLayoutElement';
+import GridLayoutGroup from '../../lib/GridLayoutGroup';
 
 customElements.define("grid-layout-element", GridLayoutElement);
+customElements.define("grid-layout-group", GridLayoutGroup);
 customElements.define("grid-layout", GridLayout);
 
 export default class ShowcaseLayout extends React.Component {
@@ -98,6 +100,8 @@ export default class ShowcaseLayout extends React.Component {
           Change Compaction Type
         </button>
         <grid-layout row-height={this.props.rowHeight} ref={elem => this.nv = elem}>
+          <grid-layout-group data-id="group" y="3"></grid-layout-group>
+          <grid-layout-group data-id="group1" y="5"></grid-layout-group>
           {this.generateDOM()}
         </grid-layout>
       </div>

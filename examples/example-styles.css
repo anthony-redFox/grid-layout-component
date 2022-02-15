@@ -19,7 +19,7 @@ body {
   -webkit-columns: 120px;
   columns: 120px;
 }
-grid-layout-element:not(.react-grid-placeholder) {
+grid-layout-element, grid-layout-group {
   background: #ccc;
   border: 1px solid black;
 }

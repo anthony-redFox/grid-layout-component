@@ -7,7 +7,8 @@ import {
   getLayoutItem,
   moveElement,
   withLayoutItem,
-  correctBounds
+  correctBounds,
+  sortLayoutItems
 } from "./utils";
 import {
   getBreakpointFromWidth,
@@ -21,11 +22,12 @@ import {
   clamp,
   type PositionParams
 } from "./calculateUtils";
-import GridItem from "./GridItem";
+import GridLayoutElement from "./GridLayoutElement";
+import GridLayoutGroup from "./GridLayoutGroup";
 import type {
   gridLayoutElementDragDetail,
   gridLayoutElementResizeDetail
-} from "./GridItem";
+} from "./GridLayoutElement";
 
 function isEqual(arr: GridLayoutElementData[], arr2: GridLayoutElementData[]) {
   if (arr.length !== arr2.length) {
@@ -73,10 +75,12 @@ export interface GridLayoutElementData {
   isDraggable?: boolean;
   isResizable?: boolean;
   isBounded?: boolean;
+  isGroup?: boolean;
   static?: boolean;
   moved?: boolean;
 }
 
+type syncData = "x" | "y" | "w" | "h";
 type keysElementData = keyof GridLayoutElementData;
 
 interface GridLayoutState {
@@ -104,6 +108,7 @@ interface GridLayoutState {
 export default class GridLayout extends HTMLElement {
   declare shadow: ShadowRoot;
   declare placeholder: HTMLDivElement;
+  template = template;
   sheet = new CSSStyleSheet();
   observer = new ResizeObserver(() => this.calculateSize());
   breakpoints = { lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 };
@@ -114,6 +119,7 @@ export default class GridLayout extends HTMLElement {
     overflow: "",
     top: 0
   };
+  groupCollapsing: Map<string, GridLayoutElementData[]> = new Map();
 
   state: GridLayoutState = {
     autoSize: true,
@@ -159,7 +165,10 @@ export default class GridLayout extends HTMLElement {
 
   resizeHandler = (event: CustomEvent<gridLayoutElementResizeDetail>) => {
     const { detail, target } = event;
-    if (!(target instanceof GridItem) || target.parentElement !== this) {
+    if (
+      !(target instanceof GridLayoutElement) ||
+      target.parentElement !== this
+    ) {
       return;
     }
 
@@ -196,9 +205,55 @@ export default class GridLayout extends HTMLElement {
     }
   };
 
-  constructor() {
-    super();
-  }
+  collapsedHandler = (event: CustomEvent<string>) => {
+    const { detail: key, target } = event;
+    if (!(target instanceof HTMLElement) || target.parentElement !== this) {
+      return;
+    }
+    const { layout: oldLayout, allowOverlap, colsNumber } = this.state;
+    const group = oldLayout.find(({ i }) => i === key);
+    if (!group) {
+      return;
+    }
+    const isCollapsed = target.hasAttribute("collapsed");
+
+    let layout: GridLayoutElementData[];
+    let set: Set<string>;
+    if (isCollapsed) {
+      const maxY = oldLayout.reduce(
+        (gY, { isGroup, y }) => (isGroup && group.y < y ? Math.min(gY, y) : gY),
+        Infinity
+      );
+      let collapsed: GridLayoutElementData[] = [];
+      layout = oldLayout.filter((l) => {
+        const isGrouped = l.y < maxY && l.y > group.y;
+        if (isGrouped) {
+          collapsed.push(l);
+        }
+        return !isGrouped;
+      });
+      collapsed = sortLayoutItems(collapsed, this.state.compactType);
+      collapsed.forEach((l) => (l.y = group.y));
+      set = new Set(collapsed.map((l) => l.i));
+      this.groupCollapsing.set(key, collapsed);
+    } else {
+      const collapsed = this.groupCollapsing.get(key) || [];
+      set = new Set(collapsed.map((l) => l.i));
+      layout = [...oldLayout, ...collapsed];
+      this.groupCollapsing.delete(key);
+    }
+    for (const node of this.children) {
+      if (!(node instanceof HTMLElement) || !set.has(node.dataset.id || "")) {
+        continue;
+      }
+      node.style.visibility = isCollapsed ? "hidden" : "visible";
+    }
+    const newLayout = allowOverlap
+      ? layout
+      : compact(layout, this.state.compactType, colsNumber);
+    this.setState({ layout: newLayout });
+    this.onLayoutMaybeChanged(layout, oldLayout);
+  };
 
   setState(update: Partial<GridLayoutState>) {
     Object.assign(this.state, update);
@@ -278,6 +333,9 @@ export default class GridLayout extends HTMLElement {
     if (!l) return;
 
     const { x, y } = calcXY(this.getPositionParams(), top, left, l.w, l.h);
+    if (l.isGroup && this.groupCollapsing.has(key)) {
+      this.groupCollapsing.get(key)?.forEach((l) => (l.y = y));
+    }
     // Move the element here
     const isUserAction = true;
     layout = moveElement(
@@ -320,7 +378,7 @@ export default class GridLayout extends HTMLElement {
 
   onResize(
     { key, width, height }: gridLayoutElementResizeDetail,
-    item: GridItem
+    item: GridLayoutElement
   ) {
     const { layout } = this.state;
     const { colsNumber, preventCollision, allowOverlap } = this.state;
@@ -342,7 +400,7 @@ export default class GridLayout extends HTMLElement {
       (l: GridLayoutElementData) => {
         // Something like quad tree should be used
         // to find collisions faster
-        let hasCollisions;
+        let hasCollisions = false;
         if (preventCollision && !allowOverlap) {
           const collisions = getAllCollisions(layout, { ...l, w, h }).filter(
             (layoutItem: GridLayoutElementData) => layoutItem.i !== l.i
@@ -504,6 +562,10 @@ export default class GridLayout extends HTMLElement {
       "gridLayoutElementMaximaze",
       this.maximazeHandler as EventListener
     );
+    this.addEventListener(
+      "gridLayoutGroupCollapsed",
+      this.collapsedHandler as EventListener
+    );
     this.shadow = this.attachShadow({ mode: "open" });
     // @ts-expect-error global
     this.shadow.adoptedStyleSheets = [this.sheet];
@@ -516,18 +578,18 @@ export default class GridLayout extends HTMLElement {
 
       const layout: GridLayoutElementData[] = [];
       const children = slot.assignedNodes();
-      const { isDraggable, isResizable, isBounded } = this.state;
       children.forEach((node) => {
         if (!(node instanceof HTMLElement) || !node.dataset.id) {
           return;
         }
+        const isGroup = node instanceof GridLayoutGroup;
 
         const x = Number.parseInt(node.getAttribute("x") || "0");
         const y = Number.parseInt(node.getAttribute("y") || "0");
         const w = Number.parseInt(node.getAttribute("w") || "1");
         const h = Number.parseInt(node.getAttribute("h") || "1");
 
-        const l = {
+        const l: GridLayoutElementData = {
           i: node.dataset.id,
           static: node.hasAttribute("static"),
           isDraggable: node.hasAttribute("drag")
@@ -546,17 +608,9 @@ export default class GridLayout extends HTMLElement {
         };
         layout.push(l);
 
-        const drag = (l.isDraggable ?? isDraggable) && !l.static;
-        const bounded = drag && isBounded && l.isBounded !== false;
-        const resizable = isResizable && !l.static;
-        if (drag && !node.hasAttribute("drag")) {
-          node.setAttribute("drag", "");
-        }
-        if (resizable && !node.hasAttribute("resizable")) {
-          node.setAttribute("resizable", "");
-        }
-        if (bounded && !node.hasAttribute("bounded")) {
-          node.setAttribute("bounded", "");
+        if (isGroup) {
+          l.w = this.state.colsNumber;
+          l.isGroup = true;
         }
       });
       this.layout = cloneLayout(layout);
@@ -592,38 +646,24 @@ export default class GridLayout extends HTMLElement {
     }
   }
 
-  fastRender(layout: Record<string, GridLayoutElementData>) {
-    const arr = ["x", "y"] as const;
+  syncWithNode(
+    layout: Record<string, GridLayoutElementData>,
+    attrs: syncData[] = ["x", "y", "w", "h"]
+  ) {
     for (const node of this.children) {
       if (
-        !(node instanceof GridItem) ||
+        !(node instanceof GridLayoutElement) ||
         !node.dataset.id ||
         !layout[node.dataset.id]
       ) {
         continue;
       }
       const l = layout[node.dataset.id];
-      arr.forEach(
+      attrs.forEach(
         (key) =>
           node.state[key] !== l[key] && node.setAttribute(key, String(l[key]))
       );
     }
-
-    const activeDrag = this.state.activeDrag;
-    if (!activeDrag) {
-      return;
-    }
-    const pos = calcGridItemPosition(
-      this.getPositionParams(),
-      activeDrag.x,
-      activeDrag.y,
-      activeDrag.w,
-      activeDrag.h
-    );
-
-    this.placeholder.style.transform = `translate(${pos.left}px,${pos.top}px)`;
-    this.placeholder.style.width = `${pos.width}px`;
-    this.placeholder.style.height = `${pos.height}px`;
   }
 
   /**
@@ -654,6 +694,7 @@ export default class GridLayout extends HTMLElement {
       },
       {}
     );
+
     const active = this.state.activeDrag;
     this.placeholder.classList.toggle(
       "grid-placeholder_active",
@@ -665,24 +706,26 @@ export default class GridLayout extends HTMLElement {
     }
 
     if (this.state.oldDragItem || this.state.oldResizeItem) {
-      return this.fastRender(layout);
-    }
-
-    const arr = ["x", "y", "w", "h"] as const;
-    for (const node of this.children) {
-      if (
-        !(node instanceof GridItem) ||
-        !node.dataset.id ||
-        !layout[node.dataset.id]
-      ) {
-        continue;
+      this.syncWithNode(layout, ["x", "y"]);
+      const activeDrag = this.state.activeDrag;
+      if (!activeDrag) {
+        return;
       }
-      const l = layout[node.dataset.id];
-      arr.forEach(
-        (key) =>
-          node.state[key] !== l[key] && node.setAttribute(key, String(l[key]))
+      const pos = calcGridItemPosition(
+        this.getPositionParams(),
+        activeDrag.x,
+        activeDrag.y,
+        activeDrag.w,
+        activeDrag.h
       );
+
+      this.placeholder.style.transform = `translate(${pos.left}px,${pos.top}px)`;
+      this.placeholder.style.width = `${pos.width}px`;
+      this.placeholder.style.height = `${pos.height}px`;
+      return;
     }
+    this.groupCollapsing.forEach((v) => v.forEach((l) => (layout[l.i] = l)));
+    this.syncWithNode(layout);
   }
 
   static get observedAttributes() {
