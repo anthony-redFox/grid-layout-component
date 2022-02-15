@@ -233,7 +233,7 @@ export default class GridLayout extends HTMLElement {
         return !isGrouped;
       });
       collapsed = sortLayoutItems(collapsed, this.state.compactType);
-      collapsed.forEach((l) => (l.y = group.y));
+      collapsed.forEach((l) => !l.static && (l.y = group.y));
       set = new Set(collapsed.map((l) => l.i));
       this.groupCollapsing.set(key, collapsed);
     } else {
@@ -334,7 +334,7 @@ export default class GridLayout extends HTMLElement {
 
     const { x, y } = calcXY(this.getPositionParams(), top, left, l.w, l.h);
     if (l.isGroup && this.groupCollapsing.has(key)) {
-      this.groupCollapsing.get(key)?.forEach((l) => (l.y = y));
+      this.groupCollapsing.get(key)?.forEach((l) => !l.static && (l.y = y));
     }
     // Move the element here
     const isUserAction = true;
