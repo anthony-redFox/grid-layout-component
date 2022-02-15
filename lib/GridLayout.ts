@@ -47,24 +47,16 @@ function isEqual(arr: GridLayoutElementData[], arr2: GridLayoutElementData[]) {
   });
 }
 
+const css = new CSSStyleSheet();
+// it is minify from gridLayoutStyles.css
+// @ts-expect-error global
+css.replaceSync(
+  ":host{display:block;position:relative;transition:height .2s ease}.grid-placeholder{background-color:red;position:absolute;opacity:.2;z-index:2;transition:none}.grid-placeholder_active{transition:transform .1s ease}"
+);
+
 const template = document.createElement("template");
-template.innerHTML = `<style>
-  :host {
-    display: block;
-    position: relative;
-    transition: height 200ms ease;
-  }
-  .grid-placeholder {
-    background-color: red;
-    position: absolute;
-    opacity: 0.2;
-    z-index: 2;
-    transition: none;
-  }
-  .grid-placeholder_active {
-    transition: transform 100ms ease;
-  }
-</style><div class="grid-placeholder" style="display: none;"></div><slot></slot>`;
+template.innerHTML =
+  '<div class="grid-placeholder" style="display: none;"></div><slot></slot>';
 
 export interface GridLayoutElementData {
   i: string;
@@ -536,8 +528,7 @@ export default class GridLayout extends HTMLElement {
     );
 
     // @ts-expect-error global
-    this.sheet.replaceSync(`
-      :host {
+    this.sheet.replaceSync(`:host {
         --grid-layout-cols: ${colsNumber};
         --grid-element-width: ${this.state.columnWidth}px;
         --grid-element-height: ${rowHeight}px;
@@ -545,8 +536,7 @@ export default class GridLayout extends HTMLElement {
         --grid-element-margin-top: ${margin[1]}px;
         --grid-layout-padding-top: ${containerPadding[0]}px;
         --grid-layout-padding-left: ${containerPadding[1]}px;
-      }
-    `);
+    }`);
   }
 
   connectedCallback() {
@@ -568,7 +558,7 @@ export default class GridLayout extends HTMLElement {
     );
     this.shadow = this.attachShadow({ mode: "open" });
     // @ts-expect-error global
-    this.shadow.adoptedStyleSheets = [this.sheet];
+    this.shadow.adoptedStyleSheets = [css, this.sheet];
     this.shadow.appendChild(template.content.cloneNode(true));
     this.shadow.addEventListener("slotchange", (e: Event) => {
       const slot = e.target;

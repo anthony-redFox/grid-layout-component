@@ -6,53 +6,15 @@ import type { DraggableData } from "./draggable";
 import type { ResizeHandlerOptions } from "./resizeble";
 
 const template = document.createElement("template");
-template.innerHTML = `<style>:host {
-  display: block;
-  width: calc(var(--grid-element-width) * var(--element-w, 1) + (var(--element-w, 1) - 1) * var(--grid-element-margin-left));
-  height: calc(var(--grid-element-height) * var(--element-h, 1) + (var(--element-h, 1) - 1) * var(--grid-element-margin-top));
-  transform: translate(calc((var(--grid-element-width) + var(--grid-element-margin-left)) * var(--element-x, 0) + var(--grid-layout-padding-left)),calc((var(--grid-element-height) + var(--grid-element-margin-top)) * var(--element-y, 0) + var(--grid-layout-padding-top)));
-  position: absolute;
-  box-sizing: border-box;
-  transition: transform 200ms ease, visibility 100ms linear;
-}
-:host([maximize]) {
-  position: sticky;
-  width: calc(100% - var(--grid-layout-padding-left) * 2);
-  height: calc(100% - var(--grid-layout-padding-top) * 2);
-  transform: translate(var(--grid-layout-padding-left),var(--grid-layout-padding-top));
-  transition: width 200ms ease, height 200ms ease;
-  z-index: 3;
-}
-:host([resizable]) .resizable-handle {
-  position: absolute;
-  width: 20px;
-  height: 20px;
-}
-:host([resizable="active"]) {
-  z-index: 1;
-  will-change: width, height;
-}
-:host([drag="active"]) {
-  transition: none;
-  z-index: 3;
-  will-change: transform;
-}
-:host([resizable]) .resizable-handle:before {
-  content: "";
-  position: absolute;
-  right: 3px;
-  bottom: 3px;
-  width: 5px;
-  height: 5px;
-  border-right: 2px solid rgba(0, 0, 0, 0.4);
-  border-bottom: 2px solid rgba(0, 0, 0, 0.4);
-}
-:host([resizable]) .resizable-handle.resizable-handle-se {
-  bottom: 0;
-  right: 0;
-  cursor: se-resize;
-}
-</style><slot></slot><div class="resizable-handle resizable-handle-se"></div>`;
+template.innerHTML =
+  '<slot></slot><div class="resizable-handle resizable-handle-se"></div>';
+
+const css = new CSSStyleSheet();
+// it is minify from gridLayoutElementStyles.css
+// @ts-expect-error global
+css.replaceSync(
+  ':host{display:block;width:calc(var(--grid-element-width) * var(--element-w,1) + (var(--element-w,1) - 1) * var(--grid-element-margin-left));height:calc(var(--grid-element-height) * var(--element-h,1) + (var(--element-h,1) - 1) * var(--grid-element-margin-top));transform:translate(calc((var(--grid-element-width) + var(--grid-element-margin-left)) * var(--element-x,0) + var(--grid-layout-padding-left)),calc((var(--grid-element-height) + var(--grid-element-margin-top)) * var(--element-y,0) + var(--grid-layout-padding-top)));position:absolute;box-sizing:border-box;transition:transform .2s ease,visibility .1s linear}:host([maximize]){position:sticky;width:calc(100% - var(--grid-layout-padding-left) * 2);height:calc(100% - var(--grid-layout-padding-top) * 2);transform:translate(var(--grid-layout-padding-left),var(--grid-layout-padding-top));transition:width .2s ease,height .2s ease;z-index:3}:host([resizable]) .resizable-handle{position:absolute;width:20px;height:20px}:host([resizable=active]){z-index:1;will-change:width,height}:host([drag=active]){transition:none;z-index:3;will-change:transform}:host([resizable]) .resizable-handle:before{content:"";position:absolute;right:3px;bottom:3px;width:5px;height:5px;border-right:2px solid rgba(0,0,0,.4);border-bottom:2px solid rgba(0,0,0,.4)}:host([resizable]) .resizable-handle.resizable-handle-se{bottom:0;right:0;cursor:se-resize}'
+);
 
 interface GridLayoutElementState {
   h: number;
@@ -362,7 +324,7 @@ export default class GridLayoutElement extends HTMLElement {
     this.shadow = this.attachShadow({ mode: "open" });
     this.shadow.appendChild(this.template.content.cloneNode(true));
     // @ts-expect-error global
-    this.shadow.adoptedStyleSheets = [this.sheet];
+    this.shadow.adoptedStyleSheets = [css, this.sheet];
     this.makeDraggable();
     this.makeResizable();
   }
@@ -387,14 +349,9 @@ export default class GridLayoutElement extends HTMLElement {
 
   setVaribles() {
     // @ts-expect-error global
-    this.sheet.replaceSync(`
-      :host {
-        --element-x: ${this.state.x};
-        --element-y: ${this.state.y};
-        --element-h: ${this.state.h};
-        --element-w: ${this.state.w};
-      }
-    `);
+    this.sheet.replaceSync(
+      `:host{--element-x: ${this.state.x};--element-y: ${this.state.y};--element-h: ${this.state.h};--element-w: ${this.state.w};}`
+    );
   }
 
   static get observedAttributes() {

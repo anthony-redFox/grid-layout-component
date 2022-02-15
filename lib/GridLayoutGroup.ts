@@ -1,21 +1,13 @@
 import GridLayoutElement from "./GridLayoutElement";
 
 const template = document.createElement("template");
-template.innerHTML = `<style>:host {
-  display: block;
-  width: calc(var(--grid-element-width) * var(--grid-layout-cols, 1) + (var(--grid-layout-cols, 1) - 1) * var(--grid-element-margin-left));
-  height: calc(var(--grid-element-height) * var(--element-h, 1) + (var(--element-h, 1) - 1) * var(--grid-element-margin-top));
-  transform: translate(var(--grid-layout-padding-left),calc((var(--grid-element-height) + var(--grid-element-margin-top)) * var(--element-y, 0) + var(--grid-layout-padding-top)));
-  position: absolute;
-  box-sizing: border-box;
-  transition: transform 200ms ease;
-}
-:host([drag="active"]) {
-  transition: none;
-  z-index: 3;
-  will-change: transform;
-}
-</style><slot></slot><button>collapse</button>`;
+template.innerHTML = "<slot></slot><button>collapse</button>";
+const css = new CSSStyleSheet();
+// it is minify from gridLayoutGroupStyles.css
+// @ts-expect-error global
+css.replaceSync(
+  ":host{width:calc(var(--grid-element-width) * var(--grid-layout-cols,1) + (var(--grid-layout-cols,1) - 1) * var(--grid-element-margin-left));height:calc(var(--grid-element-height) * var(--element-h,1) + (var(--element-h,1) - 1) * var(--grid-element-margin-top));transform:translate(var(--grid-layout-padding-left),calc((var(--grid-element-height) + var(--grid-element-margin-top)) * var(--element-y,0) + var(--grid-layout-padding-top)))}"
+);
 
 export default class GridLayoutGroup extends GridLayoutElement {
   template = template;
@@ -43,6 +35,8 @@ export default class GridLayoutGroup extends GridLayoutElement {
 
   connectedCallback(): void {
     super.connectedCallback();
+    // @ts-expect-error global
+    this.shadow.adoptedStyleSheets = [...this.shadow.adoptedStyleSheets, css];
     const button = this.shadow.querySelector<HTMLElement>("button");
     if (!button) {
       return;

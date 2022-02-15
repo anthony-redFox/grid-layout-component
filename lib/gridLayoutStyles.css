@@ -1,0 +1,15 @@
+:host {
+  display: block;
+  position: relative;
+  transition: height 200ms ease;
+}
+.grid-placeholder {
+  background-color: red;
+  position: absolute;
+  opacity: 0.2;
+  z-index: 2;
+  transition: none;
+}
+.grid-placeholder_active {
+  transition: transform 100ms ease;
+}

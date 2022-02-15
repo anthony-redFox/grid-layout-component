@@ -1,0 +1,17 @@
+:host {
+  width: calc(
+    var(--grid-element-width) * var(--grid-layout-cols, 1) +
+      (var(--grid-layout-cols, 1) - 1) * var(--grid-element-margin-left)
+  );
+  height: calc(
+    var(--grid-element-height) * var(--element-h, 1) + (var(--element-h, 1) - 1) *
+      var(--grid-element-margin-top)
+  );
+  transform: translate(
+    var(--grid-layout-padding-left),
+    calc(
+      (var(--grid-element-height) + var(--grid-element-margin-top)) *
+        var(--element-y, 0) + var(--grid-layout-padding-top)
+    )
+  );
+}
