@@ -348,9 +348,10 @@ export default class GridLayoutElement extends HTMLElement {
   }
 
   setVaribles() {
+	const { x, y, h, w } = this.state;
     // @ts-expect-error global
     this.sheet.replaceSync(
-      `:host{--element-x: ${this.state.x};--element-y: ${this.state.y};--element-h: ${this.state.h};--element-w: ${this.state.w};}`
+      `:host{--element-x: ${x};--element-y: ${y};--element-h: ${h};--element-w: ${w};}`
     );
   }
 
