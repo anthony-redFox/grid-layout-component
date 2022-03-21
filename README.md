@@ -271,7 +271,7 @@ rowHeight: ?number = 150,
 // Flags
 //
 isDraggable: ?boolean = true,
-isResizable: ?boolean = true,
+resizable: ?boolean = true,
 isBounded: ?boolean = false,
 // If parent DOM node of ResponsiveReactGridLayout or ReactGridLayout has "transform: scale(n)" css property,
 // we should set scale coefficient to avoid render artefacts while dragging.
@@ -407,12 +407,12 @@ will be draggable, even if the item is marked `static: true`.
   minH: ?number = 0,
   maxH: ?number = Infinity,
 
-  // If true, equal to `isDraggable: false, isResizable: false`.
+  // If true, equal to `isDraggable: false, resizable: false`.
   static: ?boolean = false,
   // If false, will not be draggable. Overrides `static`.
   isDraggable: ?boolean = true,
   // If false, will not be resizable. Overrides `static`.
-  isResizable: ?boolean = true,
+  resizable: ?boolean = true,
   // By default, a handle is only shown on the bottom-right (southeast) corner.
   // Note that resizing from the top or left is generally not intuitive.
   resizeHandles?: ?Array<'s' | 'w' | 'e' | 'n' | 'sw' | 'nw' | 'se' | 'ne'> = ['se']

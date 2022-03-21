@@ -65,7 +65,7 @@ export interface GridLayoutElementData {
   h: number;
   w: number;
   isDraggable?: boolean;
-  isResizable?: boolean;
+  resizable?: boolean;
   isBounded?: boolean;
   isGroup?: boolean;
   static?: boolean;
@@ -89,7 +89,7 @@ interface GridLayoutState {
   allowOverlap: boolean;
   preventCollision: boolean;
   isDraggable: boolean;
-  isResizable: boolean;
+  resizable: boolean;
   isBounded: boolean;
   activeDrag: { x: number; y: number; h: number; w: number } | null;
   oldDragItem: GridLayoutElementData | null;
@@ -127,7 +127,7 @@ export default class GridLayout extends HTMLElement {
     allowOverlap: false,
     preventCollision: false,
     isDraggable: true,
-    isResizable: true,
+    resizable: true,
     isBounded: false,
     activeDrag: null,
     oldDragItem: null,
@@ -164,7 +164,7 @@ export default class GridLayout extends HTMLElement {
       return;
     }
 
-    if (!this.state.isResizable && !target.hasAttribute("resizable")) {
+    if (!this.state.resizable && !target.hasAttribute("resizable")) {
       event.preventDefault();
       return;
     }
@@ -585,7 +585,7 @@ export default class GridLayout extends HTMLElement {
           isDraggable: node.hasAttribute("drag")
             ? node.getAttribute("drag") !== "false"
             : undefined,
-          isResizable: node.hasAttribute("resizable")
+          resizable: node.hasAttribute("resizable")
             ? node.getAttribute("resizable") !== "false"
             : undefined,
           isBounded: node.hasAttribute("bounded")

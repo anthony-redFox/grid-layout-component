@@ -8,7 +8,7 @@ export default class NoDraggingLayout extends React.PureComponent {
   static defaultProps = {
     className: "layout",
     isDraggable: false,
-    isResizable: false,
+    resizable: false,
     items: 50,
     cols: 12,
     rowHeight: 30,
