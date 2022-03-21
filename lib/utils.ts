@@ -55,7 +55,7 @@ export function cloneLayoutItem(
     static: Boolean(layoutItem.static),
     // These can be null/undefined
     isDraggable: layoutItem.isDraggable,
-    isResizable: layoutItem.isResizable,
+    resizable: layoutItem.resizable,
     isBounded: layoutItem.isBounded,
     isGroup: layoutItem.isGroup
   };

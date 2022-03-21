@@ -45,7 +45,7 @@ describe("Lifecycle tests", function () {
       w: 100,
       h: 100,
       isDraggable: false,
-      isResizable: false,
+      resizable: false,
       isBounded: false
     };
     it("Basic Render", () => {
