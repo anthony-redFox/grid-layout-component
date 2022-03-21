@@ -567,7 +567,7 @@ export default class GridLayout extends HTMLElement {
       }
 
       const layout: GridLayoutElementData[] = [];
-      const children = slot.assignedNodes();
+      const children = slot.assignedElements();
       children.forEach((node) => {
         if (!(node instanceof HTMLElement) || !node.dataset.id) {
           return;
