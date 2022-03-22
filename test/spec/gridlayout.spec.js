@@ -17,6 +17,10 @@ describe("Grid layout tests", function () {
     document.body.removeChild(gridLayout);
   });
 
+  it("Should not be resizable by default", () => {
+    expect(gridLayout.state).toHaveProperty("resizable", false);
+  });
+
   describe("Observed Attributes", () => {
     it("Should update the state when the resizable attribute is set", () => {
       gridLayout.setAttribute("resizable", "");
