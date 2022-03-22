@@ -127,7 +127,7 @@ export default class GridLayout extends HTMLElement {
     allowOverlap: false,
     preventCollision: false,
     drag: true,
-    resizable: true,
+    resizable: false,
     isBounded: false,
     activeDrag: null,
     oldDragItem: null,
