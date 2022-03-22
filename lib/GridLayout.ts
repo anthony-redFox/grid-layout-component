@@ -625,9 +625,9 @@ export default class GridLayout extends HTMLElement {
     }
   }
 
-  attributeChangedCallback(name: string, old: string, newV: string) {
+  attributeChangedCallback(name: string, old: string, newValue: string | null) {
     if (name === "row-height") {
-      const rowHeight = Number.parseInt(newV) || this.state.rowHeight;
+      const rowHeight = Number.parseInt(newValue ?? `${this.state.rowHeight}`);
       if (!rowHeight) {
         return;
       }
