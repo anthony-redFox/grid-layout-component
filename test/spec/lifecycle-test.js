@@ -44,7 +44,7 @@ describe("Lifecycle tests", function () {
       y: 0,
       w: 100,
       h: 100,
-      isDraggable: false,
+      drag: false,
       resizable: false,
       isBounded: false
     };
@@ -172,7 +172,7 @@ describe("Lifecycle tests", function () {
           <GridItem
             {...mockProps}
             // $FlowIgnore
-            isDraggable={true}
+            drag={true}
             isBounded={true}
             onDragStart={mockOnDragStartCallback}
             onDrag={mockOnDrag}
@@ -304,7 +304,7 @@ describe("Lifecycle tests", function () {
           x: 2,
           y: 4,
           static: false,
-          isDraggable: true
+          drag: true
         });
 
         // Let's move it some more.
@@ -325,7 +325,7 @@ describe("Lifecycle tests", function () {
           x: 0,
           y: 10,
           static: false,
-          isDraggable: true
+          drag: true
         });
       });
 
@@ -349,7 +349,7 @@ describe("Lifecycle tests", function () {
           x: 2,
           y: 4,
           static: false,
-          isDraggable: true
+          drag: true
         });
       });
 

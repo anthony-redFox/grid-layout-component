@@ -6,7 +6,7 @@ const ReactGridLayout = WidthProvider(RGL);
 
 export default class GridPropertyLayout extends React.PureComponent {
   static defaultProps = {
-    isDraggable: true,
+    drag: true,
     resizable: true,
     items: 20,
     rowHeight: 30,
