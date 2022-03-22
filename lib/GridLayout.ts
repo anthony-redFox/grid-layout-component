@@ -141,7 +141,7 @@ export default class GridLayout extends HTMLElement {
       return;
     }
 
-    if (!this.state.drag && !target.hasAttribute("drag")) {
+    if (!this.state.drag) {
       event.preventDefault();
       return;
     }
@@ -638,7 +638,8 @@ export default class GridLayout extends HTMLElement {
         this.calculateSize();
         break;
       }
-      case "resizable": {
+      case "resizable":
+      case "drag": {
         this.setState({ [name]: newValue !== null });
         break;
       }
