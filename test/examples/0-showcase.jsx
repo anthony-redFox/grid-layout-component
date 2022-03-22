@@ -99,7 +99,7 @@ export default class ShowcaseLayout extends React.Component {
         <button onClick={this.onCompactTypeChange}>
           Change Compaction Type
         </button>
-        <grid-layout row-height={this.props.rowHeight} ref={elem => this.nv = elem}>
+        <grid-layout resizable="" row-height={this.props.rowHeight} ref={elem => this.nv = elem}>
           <grid-layout-group data-id="group" y="3"></grid-layout-group>
           <grid-layout-group data-id="group1" y="5"></grid-layout-group>
           {this.generateDOM()}
