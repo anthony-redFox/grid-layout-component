@@ -164,7 +164,7 @@ export default class GridLayout extends HTMLElement {
       return;
     }
 
-    if (!this.state.resizable && !target.hasAttribute("resizable")) {
+    if (!this.state.resizable) {
       event.preventDefault();
       return;
     }
@@ -636,6 +636,10 @@ export default class GridLayout extends HTMLElement {
         }
         this.state.rowHeight = rowHeight;
         this.calculateSize();
+        break;
+      }
+      case "resizable": {
+        this.setState({ [name]: newValue !== null });
         break;
       }
     }

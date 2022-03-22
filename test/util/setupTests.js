@@ -1,5 +1,7 @@
 // @flow
 
+import "construct-style-sheets-polyfill";
+import ResizeObserver from "resize-observer-polyfill";
 import Enzyme from "enzyme";
 import Adapter from "enzyme-adapter-react-16";
 
@@ -22,3 +24,5 @@ Object.defineProperty(HTMLElement.prototype, "offsetParent", {
     return this.parentNode;
   }
 });
+
+global.ResizeObserver = ResizeObserver;
