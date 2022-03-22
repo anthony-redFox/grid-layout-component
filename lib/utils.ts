@@ -46,18 +46,9 @@ export function cloneLayoutItem(
   layoutItem: GridLayoutElementData
 ): GridLayoutElementData {
   return {
-    w: layoutItem.w,
-    h: layoutItem.h,
-    x: layoutItem.x,
-    y: layoutItem.y,
-    i: layoutItem.i,
+    ...layoutItem,
     moved: Boolean(layoutItem.moved),
-    static: Boolean(layoutItem.static),
-    // These can be null/undefined
-    drag: layoutItem.drag,
-    resizable: layoutItem.resizable,
-    isBounded: layoutItem.isBounded,
-    isGroup: layoutItem.isGroup
+    static: Boolean(layoutItem.static)
   };
 }
 
