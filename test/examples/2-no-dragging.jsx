@@ -7,7 +7,7 @@ const ReactGridLayout = WidthProvider(RGL);
 export default class NoDraggingLayout extends React.PureComponent {
   static defaultProps = {
     className: "layout",
-    isDraggable: false,
+    drag: false,
     resizable: false,
     items: 50,
     cols: 12,

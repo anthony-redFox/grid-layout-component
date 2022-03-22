@@ -64,7 +64,7 @@ export interface GridLayoutElementData {
   y: number;
   h: number;
   w: number;
-  isDraggable?: boolean;
+  drag?: boolean;
   resizable?: boolean;
   isBounded?: boolean;
   isGroup?: boolean;
@@ -88,7 +88,7 @@ interface GridLayoutState {
   compactType: "vertical" | "horizontal";
   allowOverlap: boolean;
   preventCollision: boolean;
-  isDraggable: boolean;
+  drag: boolean;
   resizable: boolean;
   isBounded: boolean;
   activeDrag: { x: number; y: number; h: number; w: number } | null;
@@ -126,7 +126,7 @@ export default class GridLayout extends HTMLElement {
     compactType: "vertical",
     allowOverlap: false,
     preventCollision: false,
-    isDraggable: true,
+    drag: true,
     resizable: true,
     isBounded: false,
     activeDrag: null,
@@ -141,7 +141,7 @@ export default class GridLayout extends HTMLElement {
       return;
     }
 
-    if (!this.state.isDraggable && !target.hasAttribute("drag")) {
+    if (!this.state.drag && !target.hasAttribute("drag")) {
       event.preventDefault();
       return;
     }
@@ -582,7 +582,7 @@ export default class GridLayout extends HTMLElement {
         const l: GridLayoutElementData = {
           i: node.dataset.id,
           static: node.hasAttribute("static"),
-          isDraggable: node.hasAttribute("drag")
+          drag: node.hasAttribute("drag")
             ? node.getAttribute("drag") !== "false"
             : undefined,
           resizable: node.hasAttribute("resizable")

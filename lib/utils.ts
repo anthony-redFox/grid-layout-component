@@ -54,7 +54,7 @@ export function cloneLayoutItem(
     moved: Boolean(layoutItem.moved),
     static: Boolean(layoutItem.static),
     // These can be null/undefined
-    isDraggable: layoutItem.isDraggable,
+    drag: layoutItem.drag,
     resizable: layoutItem.resizable,
     isBounded: layoutItem.isBounded,
     isGroup: layoutItem.isGroup
@@ -320,7 +320,7 @@ export function moveElement(
 ): GridLayoutElementData[] {
   // If this is static and not explicitly enabled as draggable,
   // no move is possible, so we can short-circuit this immediately.
-  if (l.static && l.isDraggable !== true) return layout;
+  if (l.static && l.drag !== true) return layout;
 
   // Short-circuit if nothing to do.
   if (l.y === y && l.x === x) return layout;
