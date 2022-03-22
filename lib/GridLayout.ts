@@ -79,7 +79,7 @@ interface GridLayoutState {
   autoSize: boolean;
   responsive: boolean;
   layout: Array<GridLayoutElementData>;
-  colsNumber: number;
+  columns: number;
   rowHeight: number;
   columnWidth: number;
   containerPadding: [number, number] | null;
@@ -117,7 +117,7 @@ export default class GridLayout extends HTMLElement {
     autoSize: true,
     responsive: true,
     layout: [],
-    colsNumber: 12,
+    columns: 12,
     rowHeight: 150,
     columnWidth: 0,
     containerPadding: null,
@@ -202,7 +202,7 @@ export default class GridLayout extends HTMLElement {
     if (!(target instanceof HTMLElement) || target.parentElement !== this) {
       return;
     }
-    const { layout: oldLayout, allowOverlap, colsNumber } = this.state;
+    const { layout: oldLayout, allowOverlap, columns } = this.state;
     const group = oldLayout.find(({ i }) => i === key);
     if (!group) {
       return;
@@ -242,7 +242,7 @@ export default class GridLayout extends HTMLElement {
     }
     const newLayout = allowOverlap
       ? layout
-      : compact(layout, this.state.compactType, colsNumber);
+      : compact(layout, this.state.compactType, columns);
     this.setState({ layout: newLayout });
     this.onLayoutMaybeChanged(layout, oldLayout);
   };
@@ -273,7 +273,7 @@ export default class GridLayout extends HTMLElement {
    */
   drag({ key, top, left }: gridLayoutElementDragDetail) {
     let { layout } = this.state;
-    const { colsNumber, allowOverlap, preventCollision } = this.state;
+    const { columns, allowOverlap, preventCollision } = this.state;
     const l = getLayoutItem(layout, key);
     if (!l) return;
 
@@ -298,14 +298,14 @@ export default class GridLayout extends HTMLElement {
       isUserAction,
       preventCollision,
       this.state.compactType,
-      colsNumber,
+      columns,
       allowOverlap
     );
 
     this.setState({
       layout: allowOverlap
         ? layout
-        : compact(layout, this.state.compactType, colsNumber),
+        : compact(layout, this.state.compactType, columns),
       activeDrag: placeholder
     });
   }
@@ -320,7 +320,7 @@ export default class GridLayout extends HTMLElement {
    */
   dragStop({ key, top, left }: gridLayoutElementDragDetail) {
     let { layout } = this.state;
-    const { colsNumber, preventCollision, allowOverlap } = this.state;
+    const { columns, preventCollision, allowOverlap } = this.state;
     const l = getLayoutItem(layout, key);
     if (!l) return;
 
@@ -338,14 +338,14 @@ export default class GridLayout extends HTMLElement {
       isUserAction,
       preventCollision,
       this.state.compactType,
-      colsNumber,
+      columns,
       allowOverlap
     );
 
     // Set state
     const newLayout = allowOverlap
       ? layout
-      : compact(layout, this.state.compactType, colsNumber);
+      : compact(layout, this.state.compactType, columns);
     const { oldLayout } = this.state;
     this.setState({
       activeDrag: null,
@@ -373,7 +373,7 @@ export default class GridLayout extends HTMLElement {
     item: GridLayoutElement
   ) {
     const { layout } = this.state;
-    const { colsNumber, preventCollision, allowOverlap } = this.state;
+    const { columns, preventCollision, allowOverlap } = this.state;
     const la = getLayoutItem(layout, key);
     if (!la) {
       return;
@@ -383,7 +383,7 @@ export default class GridLayout extends HTMLElement {
     let { w, h } = calcWH(this.getPositionParams(), width, height, la.x, la.y);
 
     // Min/max capping
-    w = clamp(w, item.minW, Math.min(item.maxW, colsNumber - la.x));
+    w = clamp(w, item.minW, Math.min(item.maxW, columns - la.x));
     h = clamp(h, item.minH, item.maxH);
 
     const [newLayout, l] = withLayoutItem(
@@ -441,19 +441,19 @@ export default class GridLayout extends HTMLElement {
     this.setState({
       layout: allowOverlap
         ? newLayout
-        : compact(newLayout, this.state.compactType, colsNumber),
+        : compact(newLayout, this.state.compactType, columns),
       activeDrag: placeholder
     });
   }
 
   onResizeStop() {
     const { layout } = this.state;
-    const { colsNumber, allowOverlap } = this.state;
+    const { columns, allowOverlap } = this.state;
 
     // Set state
     const newLayout = allowOverlap
       ? layout
-      : compact(layout, this.state.compactType, colsNumber);
+      : compact(layout, this.state.compactType, columns);
     const { oldLayout } = this.state;
     this.setState({
       activeDrag: null,
@@ -485,7 +485,7 @@ export default class GridLayout extends HTMLElement {
 
   getPositionParams(): PositionParams {
     return {
-      cols: this.state.colsNumber,
+      cols: this.state.columns,
       columnWidth: this.state.columnWidth,
       containerPadding: this.state.containerPadding || this.state.margin,
       margin: this.state.margin,
@@ -499,22 +499,22 @@ export default class GridLayout extends HTMLElement {
       return;
     }
     const { responsive, compactType } = this.state;
-    let { colsNumber, containerPadding: padding } = this.state;
+    let { columns, containerPadding: padding } = this.state;
     if (responsive) {
       const breakpoint = getBreakpointFromWidth(
         this.breakpoints,
         this.clientWidth
       );
       const newCols = getColsFromBreakpoint(breakpoint, this.colsAdaptation);
-      if (newCols !== colsNumber) {
-        colsNumber = this.state.colsNumber = newCols;
+      if (newCols !== columns) {
+        columns = this.state.columns = newCols;
         padding = this.state.containerPadding =
           // @ts-expect-error need to fix
           this.containerPadding[breakpoint] || null;
         this.state.layout = compact(
-          correctBounds(cloneLayout(this.layout), { cols: colsNumber }),
+          correctBounds(cloneLayout(this.layout), { cols: columns }),
           compactType,
-          colsNumber
+          columns
         );
         this.render();
       }
@@ -529,7 +529,7 @@ export default class GridLayout extends HTMLElement {
 
     // @ts-expect-error global
     this.sheet.replaceSync(`:host {
-        --grid-layout-cols: ${colsNumber};
+        --grid-layout-cols: ${columns};
         --grid-element-width: ${this.state.columnWidth}px;
         --grid-element-height: ${rowHeight}px;
         --grid-element-margin-left: ${margin[0]}px;
@@ -599,12 +599,12 @@ export default class GridLayout extends HTMLElement {
         layout.push(l);
 
         if (isGroup) {
-          l.w = this.state.colsNumber;
+          l.w = this.state.columns;
           l.isGroup = true;
         }
       });
       this.layout = cloneLayout(layout);
-      const cols = this.state.colsNumber;
+      const cols = this.state.columns;
       const correctedLayout = correctBounds(layout, { cols });
       this.state.layout = this.state.allowOverlap
         ? correctedLayout
