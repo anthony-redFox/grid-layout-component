@@ -1,6 +1,12 @@
 const webpack = require("webpack");
+const path = require("path");
+const DtsBundleWebpack = require("dts-bundle-webpack");
 
 // Builds bundle usable <script>. Includes RGL and all deps, excluding React.
+
+const entryName = "grid-layout-component";
+const distFolder = path.resolve(__dirname, "./dist");
+
 module.exports = {
   mode: "production",
   optimization: {
@@ -8,13 +14,13 @@ module.exports = {
   },
   context: __dirname,
   entry: {
-    "grid-layout-component": "./index.ts"
+    [entryName]: "./index.ts"
   },
   experiments: {
     outputModule: true
   },
   output: {
-    path: __dirname + "/dist",
+    path: distFolder,
     filename: "[name].min.js",
     libraryTarget: "module"
   },
@@ -33,6 +39,12 @@ module.exports = {
       "process.env": {
         NODE_ENV: JSON.stringify("production")
       }
+    }),
+    new DtsBundleWebpack({
+      name: entryName,
+      main: path.resolve(distFolder, "index.d.ts"),
+      removeSource: true,
+      out: "index.d.ts"
     }),
     new webpack.optimize.ModuleConcatenationPlugin()
   ],

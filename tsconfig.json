@@ -5,6 +5,8 @@
     "target": "ES2021",
     "skipLibCheck": true,
     "isolatedModules": true,
-    "strict": true
+    "strict": true,
+    "declaration": true,
+    "declarationDir": "dist"
   }
 }

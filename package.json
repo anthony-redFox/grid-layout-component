@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "description": "A draggable and resizable grid layout with responsive breakpoints.",
   "main": "dist/grid-layout-component.min.js",
+  "types": "dist/index.d.ts",
   "scripts": {
     "lint": "eslint --ext .js,.jsx && prettier --check ./**.{json,js,yml,md,ts}",
     "test": "jest --coverage",
@@ -44,6 +45,7 @@
     "babel-loader": "^8.2.3",
     "construct-style-sheets-polyfill": "^3.1.0",
     "css-loader": "^6.6.0",
+    "dts-bundle-webpack": "^1.0.2",
     "ejs": "^3.1.6",
     "enzyme": "^3.11.0",
     "enzyme-adapter-react-16": "^1.15.6",
