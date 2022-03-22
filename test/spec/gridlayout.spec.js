@@ -61,5 +61,13 @@ describe("Grid layout tests", function () {
       gridLayout.setAttribute("columns", "ABC");
       expect(gridLayout.state).toHaveProperty("columns", currentValue);
     });
+
+    it("Should update the state when the responsive attribute is changed", () => {
+      gridLayout.setAttribute("responsive", "");
+      expect(gridLayout.state).toHaveProperty("responsive", true);
+
+      gridLayout.removeAttribute("responsive");
+      expect(gridLayout.state).toHaveProperty("responsive", false);
+    });
   });
 });
