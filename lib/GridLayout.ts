@@ -643,6 +643,16 @@ export default class GridLayout extends HTMLElement {
         this.setState({ [name]: newValue !== null });
         break;
       }
+      case "columns": {
+        const value = Number.parseInt(newValue ?? `${this.state.columns}`);
+        if (!value) {
+          return;
+        }
+
+        this.setState({ [name]: value });
+        this.calculateSize();
+        return;
+      }
     }
   }
 
@@ -729,6 +739,6 @@ export default class GridLayout extends HTMLElement {
   }
 
   static get observedAttributes() {
-    return ["row-height", "drag", "resizable", "bounded"];
+    return ["row-height", "drag", "resizable", "bounded", "columns"];
   }
 }

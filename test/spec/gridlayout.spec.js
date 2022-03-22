@@ -38,5 +38,16 @@ describe("Grid layout tests", function () {
       gridLayout.removeAttribute("drag");
       expect(gridLayout.state).toHaveProperty("drag", false);
     });
+
+    it("Should update the state when the columns attribute is changed", () => {
+      gridLayout.setAttribute("columns", "3");
+      expect(gridLayout.state).toHaveProperty("columns", 3);
+    });
+
+    it("Should use previous value of columns if invalid attribute is set", () => {
+      const currentValue = gridLayout.state.columns;
+      gridLayout.setAttribute("columns", "ABC");
+      expect(gridLayout.state).toHaveProperty("columns", currentValue);
+    });
   });
 });
