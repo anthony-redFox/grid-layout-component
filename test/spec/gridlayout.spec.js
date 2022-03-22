@@ -21,6 +21,10 @@ describe("Grid layout tests", function () {
     expect(gridLayout.state).toHaveProperty("resizable", false);
   });
 
+  it("Should not be draggable by default", () => {
+    expect(gridLayout.state).toHaveProperty("drag", false);
+  });
+
   describe("Observed Attributes", () => {
     it("Should update the state when the resizable attribute is set", () => {
       gridLayout.setAttribute("resizable", "");
