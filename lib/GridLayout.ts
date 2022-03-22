@@ -678,7 +678,7 @@ export default class GridLayout extends HTMLElement {
       return;
     }
     const layout = this.state.layout.reduce(
-      (acc: Record<string, GridLayoutElementData>, l) => {
+      (acc: Record<GridLayoutElementData["i"], GridLayoutElementData>, l) => {
         acc[l.i] = l;
         return acc;
       },
