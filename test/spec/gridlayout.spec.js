@@ -30,5 +30,13 @@ describe("Grid layout tests", function () {
 
       expect(gridLayout.state).toHaveProperty("resizable", false);
     });
+
+    it("Should update the state when the drag attribute is changed", () => {
+      gridLayout.setAttribute("drag", "");
+      expect(gridLayout.state).toHaveProperty("drag", true);
+
+      gridLayout.removeAttribute("drag");
+      expect(gridLayout.state).toHaveProperty("drag", false);
+    });
   });
 });
