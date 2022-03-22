@@ -115,7 +115,7 @@ export default class GridLayout extends HTMLElement {
 
   state: GridLayoutState = {
     autoSize: true,
-    responsive: true,
+    responsive: false,
     layout: [],
     columns: 12,
     rowHeight: 150,
