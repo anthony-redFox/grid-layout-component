@@ -12,7 +12,6 @@
     "build-example": "webpack --config webpack-examples.config.js && node ./examples/generate.js",
     "view-example": "node ./examples/generate.js && webpack serve --config webpack-examples.config.js --progress",
     "dev": "webpack serve --config webpack-dev-server.config.js --hot --progress",
-    "prepublishOnly": "make build",
     "validate": "npm ls"
   },
   "repository": {
