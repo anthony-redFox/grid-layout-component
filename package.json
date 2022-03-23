@@ -2,7 +2,7 @@
   "name": "grid-layout-component",
   "version": "0.1.0",
   "description": "A draggable and resizable grid layout with responsive breakpoints.",
-  "main": "index.ts",
+  "main": "dist/grid-layout-component.min.js",
   "scripts": {
     "lint": "eslint --ext .js,.jsx && prettier --check ./**.{json,js,yml,md,ts}",
     "test": "jest --coverage",
@@ -17,7 +17,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git@github.com:STRML/react-grid-layout.git"
+    "url": "git@github.com:anthony-redFox/grid-layout-component.git"
   },
   "keywords": [
     "grid",
