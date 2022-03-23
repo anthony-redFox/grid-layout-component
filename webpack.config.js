@@ -8,7 +8,7 @@ module.exports = {
   },
   context: __dirname,
   entry: {
-    "react-grid-layout": "./index-dev.js"
+    "grid-layout-component": "./index.ts"
   },
   experiments: {
     outputModule: true
