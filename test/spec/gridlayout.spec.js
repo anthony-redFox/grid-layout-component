@@ -29,6 +29,25 @@ describe("Grid layout tests", function () {
     expect(gridLayout.state).toHaveProperty("responsive", false);
   });
 
+  it("Should use a default template if a custom template is not defined", () => {
+    expect(gridLayout.shadowRoot.innerHTML).toContain(
+      gridLayout.template.innerHTML
+    );
+  });
+
+  it("Should use a predefined template if a custom template is defined for the grid layout instance", () => {
+    const template = document.createElement("template");
+    const templateMarkup = `<header><slot></slot></header><div class="grid-placeholder" style="display: none;"></div>`;
+    template.innerHTML = templateMarkup;
+    const gridLayout = document.createElement("grid-layout");
+    gridLayout.template = template;
+
+    document.body.appendChild(gridLayout);
+    document.body.removeChild(gridLayout);
+
+    expect(gridLayout.shadowRoot.innerHTML).toContain(templateMarkup);
+  });
+
   describe("Observed Attributes", () => {
     it("Should update the state when the resizable attribute is set", () => {
       gridLayout.setAttribute("resizable", "");
