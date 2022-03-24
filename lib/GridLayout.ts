@@ -561,7 +561,7 @@ export default class GridLayout extends HTMLElement {
     this.shadow = this.attachShadow({ mode: "open" });
     // @ts-expect-error global
     this.shadow.adoptedStyleSheets = [css, this.sheet];
-    this.shadow.appendChild(template.content.cloneNode(true));
+    this.shadow.appendChild(this.template.content.cloneNode(true));
     this.shadow.addEventListener("slotchange", (e: Event) => {
       const slot = e.target;
       if (!(slot instanceof HTMLSlotElement) || slot.name) {
