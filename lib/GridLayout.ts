@@ -102,7 +102,10 @@ export default class GridLayout extends HTMLElement {
   declare placeholder: HTMLDivElement;
   template = template;
   sheet = new CSSStyleSheet();
-  observer = new ResizeObserver(() => this.calculateSize());
+  observer = new ResizeObserver(() => {
+    this.calculateSize();
+    this.render();
+  });
   breakpoints = { lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 };
   colsAdaptation = { lg: 12, md: 10, sm: 6, xs: 4, xxs: 2 };
   containerPadding = { lg: null, md: null, sm: null, xs: null, xxs: null };
@@ -516,7 +519,6 @@ export default class GridLayout extends HTMLElement {
           compactType,
           columns
         );
-        this.render();
       }
     }
 
@@ -623,6 +625,7 @@ export default class GridLayout extends HTMLElement {
     if (style.overflow !== "visible" || style.height !== "auto") {
       this.state.autoSize = false;
     }
+    this.render();
   }
 
   attributeChangedCallback(name: string, old: string, newValue: string | null) {
