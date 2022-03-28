@@ -61,9 +61,9 @@ export default class GridLayoutElement extends HTMLElement {
   /**
    * onDragStart event handler
    * @param  {Event}  e             event data
-   * @param  {Object} callbackData  an object with node, delta and position information
+   * @param  {Object} data  an object with node, delta and position information
    */
-  onDragStart() {
+  onDragStart(e: MouseEvent | TouchEvent, data: DraggableData) {
     if (
       this.hasAttribute("static") ||
       this.hasAttribute("maximized") ||
@@ -129,7 +129,7 @@ export default class GridLayoutElement extends HTMLElement {
   /**
    * onDrag event handler
    * @param  {Event}  e             event data
-   * @param  {Object} callbackData  an object with node, delta and position information
+   * @param  {Object} data  an object with node, delta and position information
    */
   onDrag(e: MouseEvent | TouchEvent, { deltaX, deltaY }: DraggableData) {
     const dragging = this.state.dragging;
@@ -167,9 +167,9 @@ export default class GridLayoutElement extends HTMLElement {
   /**
    * onDragStop event handler
    * @param  {Event}  e             event data
-   * @param  {Object} callbackData  an object with node, delta and position information
+   * @param  {Object} data  an object with node, delta and position information
    */
-  onDragStop() {
+  onDragStop(e: MouseEvent | TouchEvent, data: DraggableData) {
     if (!this.state.dragging) {
       return;
     }
@@ -301,9 +301,9 @@ export default class GridLayoutElement extends HTMLElement {
 
   makeDraggable() {
     draggable(this, {
-      onStart: () => this.onDragStart(),
-      onDrag: (e, data) => this.onDrag(e, data),
-      onStop: () => this.onDragStop(),
+      onStart: (...args) => this.onDragStart(...args),
+      onDrag: (...args) => this.onDrag(...args),
+      onStop: (...args) => this.onDragStop(...args),
       scale: this.transformScale
     });
   }
