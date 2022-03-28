@@ -13,7 +13,7 @@ const css = new CSSStyleSheet();
 // it is minify from gridLayoutElementStyles.css
 // @ts-expect-error global
 css.replaceSync(
-  ':host{display:block;width:calc(var(--grid-element-width) * var(--element-w,1) + (var(--element-w,1) - 1) * var(--grid-element-margin-left));height:calc(var(--grid-element-height) * var(--element-h,1) + (var(--element-h,1) - 1) * var(--grid-element-margin-top));transform:translate(calc((var(--grid-element-width) + var(--grid-element-margin-left)) * var(--element-x,0) + var(--grid-layout-padding-left)),calc((var(--grid-element-height) + var(--grid-element-margin-top)) * var(--element-y,0) + var(--grid-layout-padding-top)));position:absolute;box-sizing:border-box;transition:transform .2s ease,visibility .1s linear}:host([maximize]){position:sticky;width:calc(100% - var(--grid-layout-padding-left) * 2);height:calc(100% - var(--grid-layout-padding-top) * 2);transform:translate(var(--grid-layout-padding-left),var(--grid-layout-padding-top));transition:width .2s ease,height .2s ease;z-index:3}:host([resizable]) .resizable-handle{position:absolute;width:20px;height:20px}:host([resizable=active]){z-index:1;will-change:width,height}:host([drag=active]){transition:none;z-index:3;will-change:transform}:host([resizable]) .resizable-handle:before{content:"";position:absolute;right:3px;bottom:3px;width:5px;height:5px;border-right:2px solid rgba(0,0,0,.4);border-bottom:2px solid rgba(0,0,0,.4)}:host([resizable]) .resizable-handle.resizable-handle-se{bottom:0;right:0;cursor:se-resize}'
+  ':host{display:block;width:calc(var(--grid-element-width) * var(--element-w,1) + (var(--element-w,1) - 1) * var(--grid-element-margin-left));height:calc(var(--grid-element-height) * var(--element-h,1) + (var(--element-h,1) - 1) * var(--grid-element-margin-top));transform:translate(calc((var(--grid-element-width) + var(--grid-element-margin-left)) * var(--element-x,0) + var(--grid-layout-padding-left)),calc((var(--grid-element-height) + var(--grid-element-margin-top)) * var(--element-y,0) + var(--grid-layout-padding-top)));position:absolute;box-sizing:border-box;transition:transform .2s ease,visibility .1s linear}:host([maximized]){position:sticky;width:calc(100% - var(--grid-layout-padding-left) * 2);height:calc(100% - var(--grid-layout-padding-top) * 2);transform:translate(var(--grid-layout-padding-left),var(--grid-layout-padding-top));transition:width .2s ease,height .2s ease;z-index:3}:host([resizable]) .resizable-handle{position:absolute;width:20px;height:20px}:host([resizable=active]){z-index:1;will-change:width,height}:host([drag=active]){transition:none;z-index:3;will-change:transform}:host([resizable]) .resizable-handle:before{content:"";position:absolute;right:3px;bottom:3px;width:5px;height:5px;border-right:2px solid rgba(0,0,0,.4);border-bottom:2px solid rgba(0,0,0,.4)}:host([resizable]) .resizable-handle.resizable-handle-se{bottom:0;right:0;cursor:se-resize}'
 );
 
 interface GridLayoutElementState {
@@ -66,7 +66,7 @@ export default class GridLayoutElement extends HTMLElement {
   onDragStart() {
     if (
       this.hasAttribute("static") ||
-      this.hasAttribute("maximize") ||
+      this.hasAttribute("maximized") ||
       this.getAttribute("drag") === "false"
     ) {
       return false;
@@ -224,7 +224,7 @@ export default class GridLayoutElement extends HTMLElement {
       } {
     if (
       this.hasAttribute("static") ||
-      this.hasAttribute("maximize") ||
+      this.hasAttribute("maximized") ||
       this.getAttribute("resizable") === "false"
     ) {
       return false;
@@ -337,7 +337,7 @@ export default class GridLayoutElement extends HTMLElement {
     if ("x" === name || "y" === name || "h" === name || "w" === name) {
       this.state[name] = Number.parseInt(newValue || "");
       this.setVaribles();
-    } else if (name === "maximize") {
+    } else if (name === "maximized") {
       this.dispatchEvent(
         new CustomEvent("gridLayoutElementMaximaze", {
           bubbles: true,
@@ -348,7 +348,7 @@ export default class GridLayoutElement extends HTMLElement {
   }
 
   setVaribles() {
-	const { x, y, h, w } = this.state;
+    const { x, y, h, w } = this.state;
     // @ts-expect-error global
     this.sheet.replaceSync(
       `:host{--element-x: ${x};--element-y: ${y};--element-h: ${h};--element-w: ${w};}`
@@ -356,6 +356,6 @@ export default class GridLayoutElement extends HTMLElement {
   }
 
   static get observedAttributes() {
-    return ["x", "y", "h", "w", "maximize"];
+    return ["x", "y", "h", "w", "maximized"];
   }
 }

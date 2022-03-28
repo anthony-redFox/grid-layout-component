@@ -22,7 +22,7 @@
   box-sizing: border-box;
   transition: transform 200ms ease, visibility 100ms linear;
 }
-:host([maximize]) {
+:host([maximized]) {
   position: sticky;
   width: calc(100% - var(--grid-layout-padding-left) * 2);
   height: calc(100% - var(--grid-layout-padding-top) * 2);

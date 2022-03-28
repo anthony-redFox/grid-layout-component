@@ -26,7 +26,7 @@ export default class GridLayoutGroup extends GridLayoutElement {
       );
       return;
     }
-    if (["x", "h", "w", "maximize"].includes(name) && newValue !== null) {
+    if (["x", "h", "w", "maximized"].includes(name) && newValue !== null) {
       this.removeAttribute(name);
       return;
     }
@@ -48,6 +48,6 @@ export default class GridLayoutGroup extends GridLayoutElement {
   }
 
   static get observedAttributes() {
-    return ["x", "y", "h", "w", "maximize", "collapsed"];
+    return ["x", "y", "h", "w", "maximized", "collapsed"];
   }
 }
