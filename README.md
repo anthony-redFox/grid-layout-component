@@ -416,7 +416,7 @@ will be draggable, even if the item is marked `static: true`.
   // Note that resizing from the top or left is generally not intuitive.
   resizeHandles?: ?Array<'s' | 'w' | 'e' | 'n' | 'sw' | 'nw' | 'se' | 'ne'> = ['se']
   // If true and draggable, item will be moved only within grid.
-  isBounded: ?boolean = false
+  bounded: ?boolean = false
 }
 ```
 

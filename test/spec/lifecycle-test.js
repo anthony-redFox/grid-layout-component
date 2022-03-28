@@ -172,7 +172,7 @@ describe("Lifecycle tests", function () {
             {...mockProps}
             // $FlowIgnore
             drag={true}
-            isBounded={true}
+            bounded={true}
             onDragStart={mockOnDragStartCallback}
             onDrag={mockOnDrag}
           />
