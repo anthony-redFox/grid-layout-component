@@ -39,7 +39,7 @@ export default class ShowcaseLayout extends React.Component {
     return _.map(this.state.layouts.lg, function(l, i) {
       return (
         <grid-layout-element data-id={i} key={i} static={l.static ? '' : null}
-          x={l.x || 0} y={l.y || 0} w={l.w || 1} h={l.h || 1} resizable=""
+          x={l.x || 0} y={l.y || 0} w={l.w || 1} h={l.h || 1} resizable="" drag=""
         >
           {l.static ? (
             <span

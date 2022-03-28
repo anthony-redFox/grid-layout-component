@@ -582,15 +582,9 @@ export default class GridLayout extends HTMLElement {
         const l: GridLayoutElementData = {
           i: node.dataset.id,
           static: node.hasAttribute("static"),
-          drag: node.hasAttribute("drag")
-            ? node.getAttribute("drag") !== "false"
-            : undefined,
-          resizable: node.hasAttribute("resizable")
-            ? node.getAttribute("resizable") !== "false"
-            : undefined,
-          bounded: node.hasAttribute("bounded")
-            ? node.getAttribute("bounded") !== "false"
-            : undefined,
+          drag: node.hasAttribute("drag"),
+          resizable: node.hasAttribute("resizable"),
+          bounded: node.hasAttribute("bounded"),
           x,
           y,
           w,

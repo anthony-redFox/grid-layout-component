@@ -67,7 +67,7 @@ export default class GridLayoutElement extends HTMLElement {
     if (
       this.hasAttribute("static") ||
       this.hasAttribute("maximized") ||
-      this.getAttribute("drag") === "false"
+      !this.hasAttribute("drag")
     ) {
       return false;
     }
@@ -225,7 +225,7 @@ export default class GridLayoutElement extends HTMLElement {
     if (
       this.hasAttribute("static") ||
       this.hasAttribute("maximized") ||
-      this.getAttribute("resizable") === "false"
+      !this.hasAttribute("resizable")
     ) {
       return false;
     }
