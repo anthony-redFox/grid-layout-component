@@ -66,7 +66,7 @@ export interface GridLayoutElementData {
   w: number;
   drag?: boolean;
   resizable?: boolean;
-  isBounded?: boolean;
+  bounded?: boolean;
   isGroup?: boolean;
   static?: boolean;
   moved?: boolean;
@@ -588,7 +588,7 @@ export default class GridLayout extends HTMLElement {
           resizable: node.hasAttribute("resizable")
             ? node.getAttribute("resizable") !== "false"
             : undefined,
-          isBounded: node.hasAttribute("bounded")
+          bounded: node.hasAttribute("bounded")
             ? node.getAttribute("bounded") !== "false"
             : undefined,
           x,
