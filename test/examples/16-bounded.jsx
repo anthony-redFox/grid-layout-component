@@ -53,7 +53,6 @@ class BoundedLayout extends React.PureComponent {
       <ReactGridLayout
         layout={this.state.layout}
         onLayoutChange={this.onLayoutChange}
-        isBounded={true}
         {...this.props}
       >
         {this.generateDOM()}

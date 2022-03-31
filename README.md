@@ -272,7 +272,6 @@ rowHeight: ?number = 150,
 //
 drag: ?boolean = true,
 resizable: ?boolean = true,
-isBounded: ?boolean = false,
 // If parent DOM node of ResponsiveReactGridLayout or ReactGridLayout has "transform: scale(n)" css property,
 // we should set scale coefficient to avoid render artefacts while dragging.
 transformScale: ?number = 1,
