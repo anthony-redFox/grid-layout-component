@@ -652,12 +652,17 @@ export default class GridLayout extends HTMLElement {
         break;
       }
       case "columns": {
-        const value = Number.parseInt(newValue ?? `${this.state.columns}`);
-        if (!value) {
+        const cols = Number.parseInt(newValue ?? `${this.state.columns}`);
+        if (!cols) {
           return;
         }
 
-        this.setState({ [name]: value });
+        const correctedLayout = correctBounds(this.state.layout, { cols });
+        const layout = this.state.allowOverlap
+          ? correctedLayout
+          : compact(correctedLayout, this.state.compactType, cols);
+        this.onLayoutMaybeChanged(layout, this.state.layout);
+        this.setState({ [name]: cols, layout });
         this.calculateSize();
         return;
       }
