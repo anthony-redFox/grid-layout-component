@@ -1,8 +1,8 @@
 # Grid-Layout-Component
 
 [![Node.js CI](https://github.com/anthony-redFox/grid-layout-component/actions/workflows/node.js.yml/badge.svg)](https://github.com/anthony-redFox/grid-layout-component/actions/workflows/node.js.yml)
-[![npm package](https://img.shields.io/npm/v/react-grid-layout.svg?style=flat-square)](https://www.npmjs.org/package/react-grid-layout)
-[![npm downloads](https://img.shields.io/npm/dt/react-grid-layout.svg?maxAge=2592000)]()
+[![npm package](https://img.shields.io/npm/v/grid-layout-component.svg?style=flat-square)](https://www.npmjs.org/package/grid-layout-component)
+[![npm downloads](https://img.shields.io/npm/dt/grid-layout-component.svg?maxAge=2592000)]()
 
 It is fork of [React-Grid-Layout](https://react-grid-layout.github.io/react-grid-layout/) and was reworked on web compoenent. Grid Layout Component is a grid layout system much like [Packery](http://packery.metafizzy.co/) or
 [Gridster](http://dsmorse.github.io/gridster.js/).
