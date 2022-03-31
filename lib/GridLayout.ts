@@ -56,7 +56,7 @@ css.replaceSync(
 
 const template = document.createElement("template");
 template.innerHTML =
-  '<div class="grid-placeholder" style="display: none;"></div><slot></slot>';
+  '<div id="placeholder" class="grid-placeholder" style="display: none;"></div><slot></slot>';
 
 export interface GridLayoutElementData {
   i: string;
@@ -98,7 +98,7 @@ interface GridLayoutState {
 
 export default class GridLayout extends HTMLElement {
   declare shadow: ShadowRoot;
-  declare placeholder: HTMLDivElement;
+  declare placeholder: HTMLElement;
   template = template;
   sheet = new CSSStyleSheet();
   observer = new ResizeObserver(() => {
@@ -606,8 +606,7 @@ export default class GridLayout extends HTMLElement {
       this.onLayoutMaybeChanged(this.state.layout, this.layout);
       this.render();
     });
-    const placeholder =
-      this.shadow.querySelector<HTMLDivElement>(".grid-placeholder");
+    const placeholder = this.shadow.getElementById("placeholder");
     if (placeholder) {
       this.placeholder = placeholder;
     }

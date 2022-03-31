@@ -37,7 +37,7 @@ describe("Grid layout tests", function () {
 
   it("Should use a predefined template if a custom template is defined for the grid layout instance", () => {
     const template = document.createElement("template");
-    const templateMarkup = `<header><slot></slot></header><div class="grid-placeholder" style="display: none;"></div>`;
+    const templateMarkup = `<header><slot></slot></header><div id="placeholder" style="display: none;"></div>`;
     template.innerHTML = templateMarkup;
     const gridLayout = document.createElement("grid-layout");
     gridLayout.template = template;
