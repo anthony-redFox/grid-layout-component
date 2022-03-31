@@ -90,7 +90,6 @@ interface GridLayoutState {
   preventCollision: boolean;
   drag: boolean;
   resizable: boolean;
-  isBounded: boolean;
   activeDrag: { x: number; y: number; h: number; w: number } | null;
   oldDragItem: GridLayoutElementData | null;
   oldLayout: Array<GridLayoutElementData> | null;
@@ -131,7 +130,6 @@ export default class GridLayout extends HTMLElement {
     preventCollision: false,
     drag: false,
     resizable: false,
-    isBounded: false,
     activeDrag: null,
     oldDragItem: null,
     oldLayout: null,
@@ -747,13 +745,6 @@ export default class GridLayout extends HTMLElement {
   }
 
   static get observedAttributes() {
-    return [
-      "bounded",
-      "columns",
-      "drag",
-      "resizable",
-      "responsive",
-      "row-height"
-    ];
+    return ["columns", "drag", "resizable", "responsive", "row-height"];
   }
 }
