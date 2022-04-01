@@ -540,6 +540,10 @@ export default class GridLayout extends HTMLElement {
   }
 
   connectedCallback() {
+    if (this.shadow) {
+      return;
+    }
+
     this.addEventListener(
       "gridLayoutElementDrag",
       this.dragHandler as EventListener

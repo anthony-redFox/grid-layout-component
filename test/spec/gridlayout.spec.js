@@ -48,6 +48,15 @@ describe("Grid layout tests", function () {
     expect(gridLayout.shadowRoot.innerHTML).toContain(templateMarkup);
   });
 
+  it("Should be able to connect to the DOM multiple times", () => {
+    const reconnectLayout = () => {
+      document.body.removeChild(gridLayout);
+      document.body.appendChild(gridLayout);
+    };
+
+    expect(reconnectLayout).not.toThrow();
+  });
+
   describe("Observed Attributes", () => {
     it("Should update the state when the resizable attribute is set", () => {
       gridLayout.setAttribute("resizable", "");

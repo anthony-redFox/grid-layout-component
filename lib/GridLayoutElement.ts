@@ -321,6 +321,10 @@ export default class GridLayoutElement extends HTMLElement {
   }
 
   connectedCallback() {
+    if (this.shadow) {
+      return;
+    }
+
     this.shadow = this.attachShadow({ mode: "open" });
     this.shadow.appendChild(this.template.content.cloneNode(true));
     // @ts-expect-error global
