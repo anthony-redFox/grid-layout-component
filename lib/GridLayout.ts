@@ -570,37 +570,7 @@ export default class GridLayout extends HTMLElement {
         return;
       }
 
-      const layout: GridLayoutElementData[] = [];
-      const children = slot.assignedElements();
-      children.forEach((node) => {
-        if (!(node instanceof HTMLElement) || !node.dataset.id) {
-          return;
-        }
-        const isGroup = node instanceof GridLayoutGroup;
-
-        const x = Number.parseInt(node.getAttribute("x") || "0");
-        const y = Number.parseInt(node.getAttribute("y") || "0");
-        const w = Number.parseInt(node.getAttribute("w") || "1");
-        const h = Number.parseInt(node.getAttribute("h") || "1");
-
-        const l: GridLayoutElementData = {
-          i: node.dataset.id,
-          static: node.hasAttribute("static"),
-          drag: node.hasAttribute("drag"),
-          resizable: node.hasAttribute("resizable"),
-          bounded: node.hasAttribute("bounded"),
-          x,
-          y,
-          w,
-          h
-        };
-        layout.push(l);
-
-        if (isGroup) {
-          l.w = this.state.columns;
-          l.isGroup = true;
-        }
-      });
+      const layout = this._collectLayoutState();
       this.layout = cloneLayout(layout);
       const cols = this.state.columns;
       const correctedLayout = correctBounds(layout, { cols });
@@ -744,6 +714,50 @@ export default class GridLayout extends HTMLElement {
     }
     this.groupCollapsing.forEach((v) => v.forEach((l) => (layout[l.i] = l)));
     this.syncWithNode(layout);
+  }
+
+  _collectLayoutState(): GridLayoutState["layout"] {
+    const layout: GridLayoutState["layout"] = [];
+    for (const child of this.children) {
+      const isLayoutElement = child instanceof GridLayoutElement;
+      const isGroup = child instanceof GridLayoutGroup;
+      if ((!isLayoutElement && !isGroup) || !child.dataset.id) {
+        continue;
+      }
+
+      const x = Number.parseInt(child.getAttribute("x") || "0");
+      const y = Number.parseInt(child.getAttribute("y") || "0");
+      const w = Number.parseInt(child.getAttribute("w") || "1");
+      const h = Number.parseInt(child.getAttribute("h") || "1");
+
+      const l: GridLayoutElementData = {
+        i: child.dataset.id,
+        static: child.hasAttribute("static"),
+        drag: child.hasAttribute("drag"),
+        resizable: child.hasAttribute("resizable"),
+        bounded: child.hasAttribute("bounded"),
+        x,
+        y,
+        w,
+        h
+      };
+      layout.push(l);
+
+      if (isGroup) {
+        l.w = this.state.columns;
+        l.isGroup = true;
+      }
+    }
+
+    return layout;
+  }
+
+  /**
+   * Collects actual layout from children and updates the state
+   */
+  updateLayoutState() {
+    const layout = this._collectLayoutState();
+    this.setState({ layout });
   }
 
   static get observedAttributes() {
