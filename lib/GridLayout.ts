@@ -571,14 +571,7 @@ export default class GridLayout extends HTMLElement {
       }
 
       const layout = this._collectLayoutState();
-      this.layout = cloneLayout(layout);
-      const cols = this.state.columns;
-      const correctedLayout = correctBounds(layout, { cols });
-      this.state.layout = this.state.allowOverlap
-        ? correctedLayout
-        : compact(correctedLayout, this.state.compactType, cols);
-      this.onLayoutMaybeChanged(this.state.layout, this.layout);
-      this.render();
+      this._calculateLayout(layout);
     });
     const placeholder = this.shadow.getElementById("placeholder");
     if (placeholder) {
@@ -752,12 +745,47 @@ export default class GridLayout extends HTMLElement {
     return layout;
   }
 
+  _calculateLayout(layout: GridLayoutState["layout"] = this.state.layout) {
+    this.layout = cloneLayout(layout);
+    const cols = this.state.columns;
+    const correctedLayout = correctBounds(layout, { cols });
+    this.state.layout = this.state.allowOverlap
+      ? correctedLayout
+      : compact(correctedLayout, this.state.compactType, cols);
+    this.onLayoutMaybeChanged(this.state.layout, this.layout);
+    this.render();
+  }
+
   /**
    * Collects actual layout from children and updates the state
    */
   updateLayoutState() {
     const layout = this._collectLayoutState();
     this.setState({ layout });
+  }
+
+  /**
+   * Applies changes to Grid Element with passed id
+   * And then recalculates all positions of Grid Elements
+   * @param  {String} id ID of the child.
+   * @param  {Object} changes Changes to apply to child.
+   */
+  changeGridElement(id: string, changes: Partial<GridLayoutElementData>) {
+    const layoutItemIndex = this.state.layout.findIndex(
+      (item) => item.i === id
+    );
+    if (layoutItemIndex === -1) {
+      return;
+    }
+
+    Object.assign(layoutItemIndex, changes);
+    const layoutItem = this.state.layout[layoutItemIndex];
+    const newLayoutItem = {
+      ...layoutItem,
+      ...changes
+    };
+    this.state.layout[layoutItemIndex] = newLayoutItem;
+    this._calculateLayout();
   }
 
   static get observedAttributes() {
