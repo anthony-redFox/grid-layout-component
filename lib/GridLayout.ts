@@ -78,7 +78,7 @@ type keysElementData = keyof GridLayoutElementData;
 interface GridLayoutState {
   autoSize: boolean;
   responsive: boolean;
-  layout: Array<GridLayoutElementData>;
+  layout?: Array<GridLayoutElementData>;
   columns: number;
   rowHeight: number;
   columnWidth: number;
@@ -92,7 +92,7 @@ interface GridLayoutState {
   resizable: boolean;
   activeDrag: { x: number; y: number; h: number; w: number } | null;
   oldDragItem: GridLayoutElementData | null;
-  oldLayout: Array<GridLayoutElementData> | null;
+  oldLayout?: Array<GridLayoutElementData>;
   oldResizeItem: GridLayoutElementData | null;
 }
 
@@ -118,7 +118,7 @@ export default class GridLayout extends HTMLElement {
   state: GridLayoutState = {
     autoSize: true,
     responsive: false,
-    layout: [],
+    layout: undefined,
     columns: 12,
     rowHeight: 150,
     columnWidth: 0,
@@ -132,7 +132,7 @@ export default class GridLayout extends HTMLElement {
     resizable: false,
     activeDrag: null,
     oldDragItem: null,
-    oldLayout: null,
+    oldLayout: undefined,
     oldResizeItem: null
   };
 
@@ -203,7 +203,8 @@ export default class GridLayout extends HTMLElement {
     if (!(target instanceof HTMLElement) || target.parentElement !== this) {
       return;
     }
-    const { layout: oldLayout, allowOverlap, columns } = this.state;
+    const oldLayout = this._collectLayout();
+    const { allowOverlap, columns } = this.state;
     const group = oldLayout.find(({ i }) => i === key);
     if (!group) {
       return;
@@ -254,12 +255,13 @@ export default class GridLayout extends HTMLElement {
   }
 
   dragStart({ key }: gridLayoutElementDragDetail) {
-    const { layout } = this.state;
+    const layout = this._collectLayout();
     const l = getLayoutItem(layout, key);
     if (!l) return;
 
     this.setState({
       oldDragItem: cloneLayoutItem(l),
+      layout,
       oldLayout: layout
     });
   }
@@ -273,7 +275,7 @@ export default class GridLayout extends HTMLElement {
    * @param {Element} node The current dragging DOM element
    */
   drag({ key, top, left }: gridLayoutElementDragDetail) {
-    let { layout } = this.state;
+    let { layout = [] } = this.state;
     const { columns, allowOverlap, preventCollision } = this.state;
     const l = getLayoutItem(layout, key);
     if (!l) return;
@@ -320,7 +322,7 @@ export default class GridLayout extends HTMLElement {
    * @param {Element} node The current dragging DOM element
    */
   dragStop({ key, top, left }: gridLayoutElementDragDetail) {
-    let { layout } = this.state;
+    let { layout = [] } = this.state;
     const { columns, preventCollision, allowOverlap } = this.state;
     const l = getLayoutItem(layout, key);
     if (!l) return;
@@ -347,25 +349,26 @@ export default class GridLayout extends HTMLElement {
     const newLayout = allowOverlap
       ? layout
       : compact(layout, this.state.compactType, columns);
-    const { oldLayout } = this.state;
+    const { oldLayout = [] } = this.state;
     this.setState({
       activeDrag: null,
       layout: newLayout,
       oldDragItem: null,
-      oldLayout: null
+      oldLayout: undefined
     });
 
     this.onLayoutMaybeChanged(newLayout, oldLayout);
   }
 
   onResizeStart({ key }: gridLayoutElementResizeDetail) {
-    const { layout } = this.state;
+    const layout = this._collectLayout();
     const l = getLayoutItem(layout, key);
     if (!l) return;
 
     this.setState({
       oldResizeItem: cloneLayoutItem(l),
-      oldLayout: this.state.layout
+      layout,
+      oldLayout: layout
     });
   }
 
@@ -373,7 +376,7 @@ export default class GridLayout extends HTMLElement {
     { key, width, height }: gridLayoutElementResizeDetail,
     item: GridLayoutElement
   ) {
-    const { layout } = this.state;
+    const { layout = [] } = this.state;
     const { columns, preventCollision, allowOverlap } = this.state;
     const la = getLayoutItem(layout, key);
     if (!la) {
@@ -448,19 +451,19 @@ export default class GridLayout extends HTMLElement {
   }
 
   onResizeStop() {
-    const { layout } = this.state;
+    const { layout = [] } = this.state;
     const { columns, allowOverlap } = this.state;
 
     // Set state
     const newLayout = allowOverlap
       ? layout
       : compact(layout, this.state.compactType, columns);
-    const { oldLayout } = this.state;
+    const { oldLayout = [] } = this.state;
     this.setState({
       activeDrag: null,
       layout: newLayout,
       oldResizeItem: null,
-      oldLayout: null
+      oldLayout: undefined
     });
 
     this.onLayoutMaybeChanged(newLayout, oldLayout);
@@ -468,11 +471,9 @@ export default class GridLayout extends HTMLElement {
 
   onLayoutMaybeChanged(
     newLayout: Array<GridLayoutElementData>,
-    oldLayout?: Array<GridLayoutElementData> | null
+    oldLayout: Array<GridLayoutElementData>
   ) {
-    if (!oldLayout) oldLayout = this.state.layout;
-
-    if (!isEqual(oldLayout, newLayout)) {
+    if (!isEqual(oldLayout || [], newLayout)) {
       this.dispatchEvent(
         new CustomEvent("layoutChanged", {
           detail: {
@@ -482,6 +483,7 @@ export default class GridLayout extends HTMLElement {
         })
       );
     }
+    this.setState({ layout: undefined });
   }
 
   getPositionParams(): PositionParams {
@@ -570,8 +572,8 @@ export default class GridLayout extends HTMLElement {
         return;
       }
 
-      const layout = this._collectLayoutState();
-      this._calculateLayout(layout);
+      const layout = this._collectLayout();
+      this._calculateLayout(layout, layout);
     });
     const placeholder = this.shadow.getElementById("placeholder");
     if (placeholder) {
@@ -615,12 +617,14 @@ export default class GridLayout extends HTMLElement {
           return;
         }
 
-        const correctedLayout = correctBounds(this.state.layout, { cols });
-        const layout = this.state.allowOverlap
-          ? correctedLayout
-          : compact(correctedLayout, this.state.compactType, cols);
-        this.onLayoutMaybeChanged(layout, this.state.layout);
-        this.setState({ [name]: cols, layout });
+        const oldLayout = this._collectLayout();
+        let layout = correctBounds(oldLayout, { cols });
+        layout = this.state.allowOverlap
+          ? layout
+          : compact(layout, this.state.compactType, cols);
+        this.setState({ layout });
+        this.onLayoutMaybeChanged(layout, oldLayout);
+        this.setState({ [name]: cols });
         this.calculateSize();
         return;
       }
@@ -652,7 +656,8 @@ export default class GridLayout extends HTMLElement {
    * @return {String} Container height in pixels.
    */
   containerHeight(): string {
-    const nbRow = bottom(this.state.layout);
+    const layout = this._collectLayout();
+    const nbRow = bottom(layout);
     const containerPaddingY = this.state.containerPadding
       ? this.state.containerPadding[1]
       : this.state.margin[1];
@@ -668,7 +673,7 @@ export default class GridLayout extends HTMLElement {
     if (!this.isConnected) {
       return;
     }
-    const layout = this.state.layout.reduce(
+    const layout = this.state.layout?.reduce(
       (acc: Record<GridLayoutElementData["i"], GridLayoutElementData>, l) => {
         acc[l.i] = l;
         return acc;
@@ -687,7 +692,9 @@ export default class GridLayout extends HTMLElement {
     }
 
     if (this.state.oldDragItem || this.state.oldResizeItem) {
-      this.syncWithNode(layout, ["x", "y"]);
+      if (layout) {
+        this.syncWithNode(layout, ["x", "y"]);
+      }
       const activeDrag = this.state.activeDrag;
       if (!activeDrag) {
         return;
@@ -705,12 +712,14 @@ export default class GridLayout extends HTMLElement {
       this.placeholder.style.height = `${pos.height}px`;
       return;
     }
-    this.groupCollapsing.forEach((v) => v.forEach((l) => (layout[l.i] = l)));
-    this.syncWithNode(layout);
+    if (layout) {
+      this.groupCollapsing.forEach((v) => v.forEach((l) => (layout[l.i] = l)));
+      this.syncWithNode(layout);
+    }
   }
 
-  _collectLayoutState(): GridLayoutState["layout"] {
-    const layout: GridLayoutState["layout"] = [];
+  _collectLayout(): GridLayoutElementData[] {
+    const layout: GridLayoutElementData[] = [];
     for (const child of this.children) {
       const isLayoutElement = child instanceof GridLayoutElement;
       const isGroup = child instanceof GridLayoutGroup;
@@ -745,23 +754,19 @@ export default class GridLayout extends HTMLElement {
     return layout;
   }
 
-  _calculateLayout(layout: GridLayoutState["layout"] = this.state.layout) {
+  _calculateLayout(
+    layout: GridLayoutElementData[],
+    oldLayout: GridLayoutElementData[]
+  ) {
     this.layout = cloneLayout(layout);
     const cols = this.state.columns;
     const correctedLayout = correctBounds(layout, { cols });
-    this.state.layout = this.state.allowOverlap
+    layout = this.state.allowOverlap
       ? correctedLayout
       : compact(correctedLayout, this.state.compactType, cols);
-    this.onLayoutMaybeChanged(this.state.layout, this.layout);
-    this.render();
-  }
-
-  /**
-   * Collects actual layout from children and updates the state
-   */
-  updateLayoutState() {
-    const layout = this._collectLayoutState();
     this.setState({ layout });
+    this.onLayoutMaybeChanged(layout, oldLayout);
+    this.render();
   }
 
   /**
@@ -771,21 +776,16 @@ export default class GridLayout extends HTMLElement {
    * @param  {Object} changes Changes to apply to child.
    */
   changeGridElement(id: string, changes: Partial<GridLayoutElementData>) {
-    const layoutItemIndex = this.state.layout.findIndex(
-      (item) => item.i === id
-    );
+    const layout = this._collectLayout();
+    const oldLayout = cloneLayout(layout);
+    const layoutItemIndex = layout.findIndex((item) => item.i === id);
     if (layoutItemIndex === -1) {
       return;
     }
 
-    Object.assign(layoutItemIndex, changes);
-    const layoutItem = this.state.layout[layoutItemIndex];
-    const newLayoutItem = {
-      ...layoutItem,
-      ...changes
-    };
-    this.state.layout[layoutItemIndex] = newLayoutItem;
-    this._calculateLayout();
+    const layoutItem = layout[layoutItemIndex];
+    layout[layoutItemIndex] = { ...layoutItem, ...changes };
+    this._calculateLayout(layout, oldLayout);
   }
 
   static get observedAttributes() {
