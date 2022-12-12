@@ -121,6 +121,7 @@ export default class GridLayoutElement extends HTMLElement {
     if (event.defaultPrevented) {
       return false;
     }
+    e.stopPropagation();
 
     this.setState({ dragging: newPosition });
     this.setAttribute("drag", "active");
