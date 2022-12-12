@@ -758,10 +758,9 @@ export default class GridLayout extends HTMLElement {
     layout: GridLayoutElementData[],
     oldLayout: GridLayoutElementData[]
   ) {
-    this.layout = cloneLayout(layout);
     const cols = this.state.columns;
     const correctedLayout = correctBounds(layout, { cols });
-    layout = this.state.allowOverlap
+    layout = this.layout = this.state.allowOverlap
       ? correctedLayout
       : compact(correctedLayout, this.state.compactType, cols);
     this.setState({ layout });

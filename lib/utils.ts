@@ -96,6 +96,10 @@ export function compact(
     // Don't move static elements
     if (!l.static) {
       l = compactItem(compareWith, l, compactType, cols, sorted);
+      if (compactType === "horizontal") {
+        // to move it horisontal right side
+        l = compactItem(compareWith, l, compactType, cols, sorted);
+      }
 
       // Add to comparison array. We only collide with items before this one.
       // Statics are already in this array.
