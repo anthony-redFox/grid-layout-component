@@ -103,7 +103,7 @@ export default class GridLayout extends HTMLElement {
   #timeout?: number;
   observer = new ResizeObserver(() => {
     clearTimeout(this.#timeout);
-    this.#timeout = setTimeout(() => {
+    this.#timeout = window.setTimeout(() => {
       this.#timeout = void 0;
       this.calculateSize();
       this.render();
