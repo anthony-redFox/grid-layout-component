@@ -49,7 +49,6 @@ function isEqual(arr: GridLayoutElementData[], arr2: GridLayoutElementData[]) {
 
 const css = new CSSStyleSheet();
 // it is minify from gridLayoutStyles.css
-// @ts-expect-error global
 css.replaceSync(
   ":host{display:block;position:relative;transition:height .2s ease}.grid-placeholder{background-color:red;position:absolute;opacity:.2;z-index:2;transition:none}.grid-placeholder_active{transition:transform .1s ease}"
 );
@@ -529,7 +528,6 @@ export default class GridLayout extends HTMLElement {
       this.clientWidth
     );
 
-    // @ts-expect-error global
     this.sheet.replaceSync(`:host {
         --grid-layout-cols: ${columns};
         --grid-element-width: ${this.state.columnWidth}px;
@@ -563,7 +561,6 @@ export default class GridLayout extends HTMLElement {
       this.collapsedHandler as EventListener
     );
     this.shadow = this.attachShadow({ mode: "open" });
-    // @ts-expect-error global
     this.shadow.adoptedStyleSheets = [css, this.sheet];
     this.shadow.appendChild(this.template.content.cloneNode(true));
     this.shadow.addEventListener("slotchange", (e: Event) => {
