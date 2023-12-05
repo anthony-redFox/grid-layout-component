@@ -100,9 +100,14 @@ export default class GridLayout extends HTMLElement {
   declare placeholder: HTMLElement;
   template = template;
   sheet = new CSSStyleSheet();
+  #timeout?: number;
   observer = new ResizeObserver(() => {
-    this.calculateSize();
-    this.render();
+    clearTimeout(this.#timeout);
+    this.#timeout = setTimeout(() => {
+      this.#timeout = void 0;
+      this.calculateSize();
+      this.render();
+    }, 250);
   });
   breakpoints = { lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 };
   colsAdaptation = { lg: 12, md: 10, sm: 6, xs: 4, xxs: 2 };
